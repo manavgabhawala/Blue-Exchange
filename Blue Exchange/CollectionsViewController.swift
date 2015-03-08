@@ -71,7 +71,6 @@ extension CollectionsViewController : UICollectionViewDataSource, UICollectionVi
 			}
 			else
 			{
-				//TODO: Show No results cell
 				var text = "Loading..."
 				if (delegate == nil || delegate!.numberOfTextbooks() == nil || delegate!.numberOfTextbooks() == 0)
 				{
@@ -93,7 +92,6 @@ extension CollectionsViewController : UICollectionViewDataSource, UICollectionVi
 			}
 			else
 			{
-				//TODO: Show No results cell
 				var text = "Loading..."
 				if (delegate == nil || delegate!.numberOfReviews() == nil || delegate!.numberOfReviews() == 0)
 				{

@@ -20,6 +20,7 @@ class HomeViewController: UIViewController
 	var course : Class? = nil
 	var sellerOnly : Bool? = nil
 	let activityView = UIActivityIndicatorView(activityIndicatorStyle: .White)
+	var schools = [School]()
 	
 	//MARK: - ViewControllerLifecycle
 	override func viewDidLoad()
@@ -40,6 +41,10 @@ class HomeViewController: UIViewController
 		{
 			let alert = UIAlertController.errorAlertController(title: "Please Connect To The Internet", message: "This application requires a valid internet connection to function properly. Please establish a valid internet connection before trying to run this application.", error: nil)
 			presentViewController(alert, animated: true, completion: nil)
+			if UIApplication.sharedApplication().isIgnoringInteractionEvents()
+			{
+				UIApplication.sharedApplication().endIgnoringInteractionEvents()
+			}
 			return
 		}
 		if (textbooksCount == 0 || textbooks.count != textbooksCount)
@@ -189,13 +194,17 @@ class HomeViewController: UIViewController
 	@IBAction func searchButton(_: UIBarButtonItem)
 	{
 		let searchController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as! SearchAndComposeViewController
+		searchController.schools = schools
 		searchController.composing = false
+		searchController.sender = self
 		navigationController?.pushViewController(searchController, animated: true)
 	}
 	@IBAction func composeButton(_: UIBarButtonItem)
 	{
 		let composeController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as! SearchAndComposeViewController
 		composeController.composing = true
+		composeController.schools = schools
+		composeController.sender = self
 		navigationController?.pushViewController(composeController, animated: true)
 	}
 	@IBAction func profileButton(_: UIBarButtonItem)

@@ -63,6 +63,7 @@ class SearchAndComposeViewController: UIViewController
 	var oppositeItem : UIBarButtonItem? = nil
 	
 	var segmentControl = UISegmentedControl()
+	weak var sender : HomeViewController?
 	
 	//MARK: - ViewController Lifecycle
 	override func viewDidLoad()
@@ -74,14 +75,16 @@ class SearchAndComposeViewController: UIViewController
 		
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: "done:")
 		navigationItem.setRightBarButtonItem(doneButton, animated: true)
-		schools = [School()]
+		if schools.count <= 0
+		{
+			schools = [School()]
+		}
 		loadCells()
 		setCells(selectedSegmentIndex: 0)
 	}
 	override func viewDidAppear(animated: Bool)
 	{
 		super.viewDidAppear(animated)
-		println(tableView.contentInset.top)
 		if oppositeItem == nil
 		{
 			if composing
@@ -112,20 +115,28 @@ class SearchAndComposeViewController: UIViewController
 		super.didReceiveMemoryWarning()
 		// Dispose of any resources that can be recreated.
 	}
-	
+	override func viewWillDisappear(animated: Bool)
+	{
+		super.viewWillDisappear(animated)
+		sender?.schools = schools
+	}
 	/**
 	This is a helper function that dims the labels of the other cells so that when selecting from the picker it is evident what you are selecting for.
 	*/
 	func dimCells ()
 	{
-		if allCells[0].count > 0
+		if allCells.count > 0
 		{
-			allCells[0].filter { $0 is PickerCell } .map { ($0 as! PickerCell).picker.reloadAllComponents() }
-			var valueExists = false
-			let _ : [Void] = allCells[0].filter { $0 == self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = 1.0; valueExists = true }
-			allCells[0].filter { $0 is CustomDetailCell && $0 != self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = self.selectedCell != nil ? 0.3 : 1.0 }
+			if allCells[0].count > 0
+			{
+				allCells[0].filter { $0 is PickerCell } .map { ($0 as! PickerCell).picker.reloadAllComponents() }
+				var valueExists = false
+				let _ : [Void] = allCells[0].filter { $0 == self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = 1.0; valueExists = true }
+				allCells[0].filter { $0 is CustomDetailCell && $0 != self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = self.selectedCell != nil ? 0.3 : 1.0 }
+			}
 		}
 	}
+	//MARK: - Actions
 	func segmentChange(segmentControl: UISegmentedControl)
 	{
 		setCells(selectedSegmentIndex: segmentControl.selectedSegmentIndex)
@@ -136,22 +147,24 @@ class SearchAndComposeViewController: UIViewController
 		if composing
 		{
 			oppositeItem = UIBarButtonItem(barButtonSystemItem: .Search, target: self, action: "switchComposing:")
+			tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Fade)
 		}
 		else
 		{
 			oppositeItem = UIBarButtonItem(barButtonSystemItem: .Compose, target: self, action: "switchComposing:")
+			tableView.deleteSections(NSIndexSet(index: 1), withRowAnimation: .Left)
 		}
 		var items = navigationController?.toolbar.items!
 		items?.removeLast()
 		items?.append(oppositeItem!)
 		navigationController?.toolbar.setItems(items, animated: true)
-		setCells(selectedSegmentIndex: segmentControl.selectedSegmentIndex)
 	}
 	func done(_: UIBarButtonItem)
 	{
 		if (composing)
 		{
 			println("Will save object here")
+			//TODO: Save object here
 		}
 		else
 		{
@@ -431,20 +444,32 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 			allCells.append(classPickerCells)
 			tableView.insertSections(NSIndexSet(index: 0), withRowAnimation: .Left)
 			allCells.append(getCells(selectedSegmentIndex: index))
-			tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Left)
+			if (composing)
+			{
+				tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Left)
+			}
 		}
 		else if (allCells.count == 1)
 		{
 			allCells.append(getCells(selectedSegmentIndex: index))
-			tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Left)
+			if (composing)
+			{
+				tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Left)
+			}
 		}
 		else if allCells.count == 2
 		{
 			let newCells = getCells(selectedSegmentIndex: index)
 			allCells.removeLast()
-			tableView.deleteSections(NSIndexSet(index: 1), withRowAnimation: .Fade)
+			if (composing)
+			{
+				tableView.deleteSections(NSIndexSet(index: 1), withRowAnimation: .Fade)
+			}
 			allCells.append(newCells)
-			tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Fade)
+			if (composing)
+			{
+				tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Fade)
+			}
 		}
 		else
 		{
@@ -508,12 +533,12 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 				{
 					allCells[0].removeAtIndex(i)
 					classPickerCells.removeAtIndex(i)
-					tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: i, inSection: newIndexPath.section)], withRowAnimation: UITableViewRowAnimation.Left)
-					if (newIndexPath.row == i-1)
+					tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: i, inSection: 0)], withRowAnimation: UITableViewRowAnimation.Left)
+					if (newIndexPath.row == i-1 && newIndexPath.section == 0)
 					{
 						return
 					}
-					if (i < newIndexPath.row)
+					if (i < newIndexPath.row && newIndexPath.section == 0)
 					{
 						newIndexPath = NSIndexPath(forRow: newIndexPath.row - 1, inSection: newIndexPath.section)
 					}
@@ -715,7 +740,7 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 		var info = notification.userInfo!
 		if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue().size
 		{
-			var contentInsets = UIEdgeInsetsMake(navigationController?.navigationBar.frame.height ?? 0, 0.0, max(keyboardSize.height, (navigationController?.toolbar.frame.height ?? 0)), 0.0)
+			var contentInsets = UIEdgeInsetsMake(0.0, 0.0, keyboardSize.height, 0.0)
 			tableView.contentInset = contentInsets
 			tableView.scrollIndicatorInsets = contentInsets
 			var rect = self.view.frame
@@ -731,7 +756,7 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 	}
 	func keyboardHidden (notification: NSNotification)
 	{
-		var contentInsets = UIEdgeInsets(top: navigationController?.navigationBar.frame.height ?? 0, left: 0, bottom: navigationController?.toolbar.frame.height ?? 0, right: 0)
+		var contentInsets = UIEdgeInsetsZero
 		tableView.contentInset = contentInsets
 		tableView.scrollIndicatorInsets = contentInsets
 	}
