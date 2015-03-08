@@ -24,15 +24,15 @@ class SearchAndComposeViewController: UIViewController
 	var subjectCell = CustomDetailCell()
 	var classCell = CustomDetailCell()
 	
-	var titleCell : TextFieldCell!
-	var versionCell : TextFieldCell!
-	var professorCell : TextFieldCell!
-	
 	var currentSchoolIndex = 0
 	var currentSubjectIndex = 0
 	var currentClassIndex = 0
 	
 	var backgroundView : UIView!
+	
+	var titleCell : TextFieldCell!
+	var versionCell : TextFieldCell!
+	var professorCell : TextFieldCell!
 	
 	weak var courseLoadPicker : UIPickerView?
 	
@@ -161,9 +161,95 @@ class SearchAndComposeViewController: UIViewController
 	}
 	func done(_: UIBarButtonItem)
 	{
-		if (composing)
+		if (composing && allCells.count > 1)
 		{
-			println("Will save object here")
+			var error = false
+			if currentClass.catalogNumber == nil
+			{
+				classCell.shakeForInvalidInput()
+				error = true
+			}
+			let user = PFUser.currentUser()
+			if (segmentControl.selectedSegmentIndex == 2)
+			{
+				let review = PFObject(className: "Review")
+				review["user"] = user
+				review["course"] = PFObject(withoutDataWithClassName: "Classes", objectId: currentClass.objectId)
+				review["rating"] = (allCells[1].filter { $0 is RatingCell }.first! as! RatingCell).ratingView.rating
+				let descriptionCell = (allCells[1].filter { $0 is DescriptionCell }.first! as! DescriptionCell)
+				let description = descriptionCell.textView.text.isEmpty ? nil : descriptionCell.textView.text
+				if description != nil { review["text"] = description }
+				let load = (allCells[1].filter { $0 is PickerCell }.first! as! PickerCell).picker.selectedRowInComponent(0)
+				if load != CourseLoad.Nil.rawValue
+				{
+					review["workload"] = load
+				}
+				let professor = professorCell.textField.text.isEmpty ? nil : professorCell.textField.text
+				if professor != nil { review["professor"] = professor }
+				review.saveInBackgroundWithBlock {(result, error) in
+					if (result && error == nil)
+					{
+						self.composing = false
+						self.done(UIBarButtonItem())
+					}
+					else
+					{
+						let alert = UIAlertController.errorAlertController(title: "Error Saving Textbook", message: "An error occurred while trying to save your textbook to our servers. Please check your internet connection and try again.", error: error)
+						self.presentViewController(alert, animated: true, completion: nil)
+					}
+				}
+				println("Will save object here")
+			}
+			else
+			{
+				let priceCell = (allCells[1].filter {$0 is PriceCell }.first! as! PriceCell)
+				let price = priceCell.textField.text.floatValue()
+				if (price == nil || abs(price!) == HUGE || price <= 0.0)
+				{
+					(priceCell.contentView.subviews as! [UIView]).map { $0.shakeForInvalidInput() }
+					error = true
+				}
+				let title = titleCell.textField.text.isEmpty ? nil : titleCell.textField.text
+				var condition : String?
+				if let cell = (allCells[1].filter{ $0 is ConditionCell }).first as? ConditionCell
+				{
+					let index = cell.segmentControl.selectedSegmentIndex
+					condition = cell.segmentControl.titleForSegmentAtIndex(index) ?? nil
+				}
+				let showPhoneNumber = (allCells[1].filter { $0 is ShowPhoneNumber }.first! as! ShowPhoneNumber).numberSwitch.on
+				let selling = Bool(segmentControl.selectedSegmentIndex)
+				segmentControl.selectedSegmentIndex = Int(!Bool(segmentControl.selectedSegmentIndex))
+				let version = versionCell.textField.text.isEmpty ? nil : versionCell.textField.text
+				let descriptionCell = (allCells[1].filter { $0 is DescriptionCell }.first! as! DescriptionCell)
+				let description = descriptionCell.textView.text.isEmpty ? nil : descriptionCell.textView.text
+				if (!error)
+				{
+					let textbook = PFObject(className: "Textbook")
+					textbook["user"] = user
+					textbook["course"] = PFObject(withoutDataWithClassName: "Classes", objectId: currentClass.objectId)
+					textbook["class"] = "\(currentClass.subject?.code ?? currentClass.subjectCode)\(currentClass.catalogNumber)"
+					textbook["showPhoneNumber"] = showPhoneNumber
+					textbook["price"] = price
+					textbook["selling"] = selling
+					if (version != nil) { textbook["edition"] = version }
+					if title != nil { textbook["title"] = title }
+					if description != nil { textbook["description"] = description }
+					if condition != nil { textbook["condition"] = condition }
+					textbook.saveInBackgroundWithBlock({(result, error) in
+						if (result && error == nil)
+						{
+							self.composing = false
+							self.done(UIBarButtonItem())
+						}
+						else
+						{
+							let alert = UIAlertController.errorAlertController(title: "Error Saving Textbook", message: "An error occurred while trying to save your textbook to our servers. Please check your internet connection and try again.", error: error)
+							self.presentViewController(alert, animated: true, completion: nil)
+						}
+					})
+				}
+				
+			}
 			//TODO: Save object here
 		}
 		else

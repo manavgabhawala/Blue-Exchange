@@ -31,6 +31,6 @@ class Textbook : AnyObjectForClass
 		title = title.isEmpty ? "No Title Available" : title
 		condition = object["condition"] as? String ?? "None"
 		description = object["description"] as? String ?? "No Description Given"
-		version = object["version"] as? String ?? "NA"
+		version = object["edition"] as? String ?? "NA"
 	}
 }
