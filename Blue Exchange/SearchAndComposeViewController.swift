@@ -11,7 +11,12 @@ import UIKit
 class SearchAndComposeViewController: UIViewController
 {
 	var composing = false
-	var tableCells = [UITableViewCell]()
+	var classPickerCells = [UITableViewCell]()
+	var buyCells = [UITableViewCell]()
+	var sellCells = [UITableViewCell]()
+	var reviewCells = [UITableViewCell]()
+	
+	var allCells = [TableSectionCells]()
 	
 	var schools = [School]()
 	
@@ -28,6 +33,8 @@ class SearchAndComposeViewController: UIViewController
 	var currentClassIndex = 0
 	
 	var backgroundView : UIView!
+	
+	weak var courseLoadPicker : UIPickerView?
 	
 	var currentSchool : School
 	{
@@ -57,6 +64,7 @@ class SearchAndComposeViewController: UIViewController
 	
 	var segmentControl = UISegmentedControl()
 	
+	//MARK: - ViewController Lifecycle
 	override func viewDidLoad()
 	{
 		super.viewDidLoad()
@@ -67,11 +75,13 @@ class SearchAndComposeViewController: UIViewController
 		let doneButton = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: "done:")
 		navigationItem.setRightBarButtonItem(doneButton, animated: true)
 		schools = [School()]
-		loadCells(0)
+		loadCells()
+		setCells(selectedSegmentIndex: 0)
 	}
 	override func viewDidAppear(animated: Bool)
 	{
 		super.viewDidAppear(animated)
+		println(tableView.contentInset.top)
 		if oppositeItem == nil
 		{
 			if composing
@@ -108,38 +118,17 @@ class SearchAndComposeViewController: UIViewController
 	*/
 	func dimCells ()
 	{
-		tableCells.filter { $0 is PickerCell } .map { ($0 as! PickerCell).picker.reloadAllComponents() }
-		if (selectedCell != nil)
+		if allCells[0].count > 0
 		{
-			for cell in tableCells
-			{
-				if (cell is CustomDetailCell && cell != selectedCell)
-				{
-					(cell as! CustomDetailCell).valueLabel.alpha = 0.3
-				}
-				else if (cell is CustomDetailCell)
-				{
-					(cell as! CustomDetailCell).valueLabel.alpha = 1.0
-				}
-			}
-		}
-		else
-		{
-			for cell in tableCells
-			{
-				if (cell is CustomDetailCell)
-				{
-					(cell as! CustomDetailCell).valueLabel.alpha = 1.0
-				}
-			}
+			allCells[0].filter { $0 is PickerCell } .map { ($0 as! PickerCell).picker.reloadAllComponents() }
+			var valueExists = false
+			let _ : [Void] = allCells[0].filter { $0 == self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = 1.0; valueExists = true }
+			allCells[0].filter { $0 is CustomDetailCell && $0 != self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = self.selectedCell != nil ? 0.3 : 1.0 }
 		}
 	}
 	func segmentChange(segmentControl: UISegmentedControl)
 	{
-		if (composing)
-		{
-			loadCells(segmentControl.selectedSegmentIndex)
-		}
+		setCells(selectedSegmentIndex: segmentControl.selectedSegmentIndex)
 	}
 	func switchComposing(_ : UIBarButtonItem)
 	{
@@ -156,13 +145,13 @@ class SearchAndComposeViewController: UIViewController
 		items?.removeLast()
 		items?.append(oppositeItem!)
 		navigationController?.toolbar.setItems(items, animated: true)
-		loadCells(segmentControl.selectedSegmentIndex)
+		setCells(selectedSegmentIndex: segmentControl.selectedSegmentIndex)
 	}
 	func done(_: UIBarButtonItem)
 	{
 		if (composing)
 		{
-			
+			println("Will save object here")
 		}
 		else
 		{
@@ -343,13 +332,11 @@ extension SearchAndComposeViewController
 //MARK: - TableView Stuff
 extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDelegate
 {
-	func loadCells(segmentIndex: Int)
+	func loadCells()
 	{
-		tableCells.removeAll(keepCapacity: false)
 		let buySellCell = tableView.dequeueReusableCellWithIdentifier("buySell") as! BuySellCell
 		segmentControl = buySellCell.segmentControl
 		segmentControl.addTarget(self, action: "segmentChange:", forControlEvents: UIControlEvents.ValueChanged)
-		segmentControl.selectedSegmentIndex = segmentIndex
 		
 		schoolCell = tableView.dequeueReusableCellWithIdentifier("detailCell") as! CustomDetailCell
 		schoolCell.valueLabel.text = "School"
@@ -363,67 +350,107 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 		selectedCell = schoolCell
 		pickerCell.picker.selectRow(currentSchoolIndex, inComponent: 0, animated: true)
 		
-		tableCells.append(buySellCell)
-		tableCells.append(schoolCell)
-		tableCells.append(pickerCell)
-		tableCells.append(subjectCell)
-		tableCells.append(classCell)
-		if (composing)
-		{
-			if (segmentControl.selectedSegmentIndex != 2)
-			{
-				let priceCell = tableView.dequeueReusableCellWithIdentifier("priceCell") as! PriceCell
-				priceCell.setup(self, placeholder: "")
-				tableCells.append(priceCell)
+		classPickerCells.append(buySellCell)
+		classPickerCells.append(schoolCell)
+		classPickerCells.append(pickerCell)
+		classPickerCells.append(subjectCell)
+		classPickerCells.append(classCell)
+		
+		let priceCell = tableView.dequeueReusableCellWithIdentifier("priceCell") as! PriceCell
+		priceCell.setup(self, placeholder: "")
+		buyCells.append(priceCell)
+		sellCells.append(priceCell)
+		
+		let textbookTitle = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
+		textbookTitle.setup(self, placeholder: "Textbook Title")
+		self.titleCell = textbookTitle
+		buyCells.append(textbookTitle)
+		sellCells.append(textbookTitle)
+		
+		let conditionCell = tableView.dequeueReusableCellWithIdentifier("conditionCell") as! ConditionCell
+		sellCells.append(conditionCell)
+		
+		let versionCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
+		versionCell.setup(self, placeholder: "Version")
+		versionCell.textField.keyboardType = UIKeyboardType.DecimalPad
+		self.versionCell = versionCell
+		buyCells.append(versionCell)
+		sellCells.append(versionCell)
+		
+		let phoneNumberCell = tableView.dequeueReusableCellWithIdentifier("phoneNumberCell") as! ShowPhoneNumber
+		buyCells.append(phoneNumberCell)
+		sellCells.append(phoneNumberCell)
+		
+		let ratingCell = tableView.dequeueReusableCellWithIdentifier("ratingCell") as! RatingCell
+		ratingCell.setup()
+		reviewCells.append(ratingCell)
+		
+		let courseLoad = tableView.dequeueReusableCellWithIdentifier("pickerCell") as! PickerCell
+		courseLoad.setup(self, delegate: self)
+		courseLoadPicker = courseLoad.picker
+		
+		reviewCells.append(courseLoad)
 				
-				let textbookTitle = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
-				textbookTitle.setup(self, placeholder: "Textbook Title")
-				self.titleCell = textbookTitle
-				tableCells.append(textbookTitle)
-				
-				if (segmentControl.selectedSegmentIndex == 1)
-				{
-					let conditionCell = tableView.dequeueReusableCellWithIdentifier("conditionCell") as! ConditionCell
-					tableCells.append(conditionCell)
-				}
-				let versionCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
-				versionCell.setup(self, placeholder: "Version")
-				versionCell.textField.keyboardType = UIKeyboardType.DecimalPad
-				self.versionCell = versionCell
-				tableCells.append(versionCell)
-				
-				let phoneNumberCell = tableView.dequeueReusableCellWithIdentifier("phoneNumberCell") as! ShowPhoneNumber
-				tableCells.append(phoneNumberCell)
-				
-			}
-			else
-			{
-				let ratingCell = tableView.dequeueReusableCellWithIdentifier("ratingCell") as! RatingCell
-				ratingCell.setup()
-				tableCells.append(ratingCell)
-				
-				let courseLoad = tableView.dequeueReusableCellWithIdentifier("conditionCell") as! ConditionCell
-				courseLoad.segmentControl.removeAllSegments()
-				courseLoad.segmentControl.frame.size.width = courseLoad.frame.size.width * 0.9
-				for i in 0..<CourseLoad.Nil.rawValue
-				{
-					courseLoad.segmentControl.insertSegmentWithTitle(CourseLoad(rawValue: i)!.description, atIndex: i, animated: true)
-				}
-				courseLoad.segmentControl.sizeToFit()
-				tableCells.append(courseLoad)
-				
-				let professorCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
-				professorCell.setup(self, placeholder: "Professor")
-				self.professorCell = professorCell
-				tableCells.append(professorCell)
-			}
-			let descriptionCell = tableView.dequeueReusableCellWithIdentifier("descriptionCell") as! DescriptionCell
-			descriptionCell.setup()
-			descriptionCell.textView.returnKeyType = UIReturnKeyType.Done
-			tableCells.append(descriptionCell)
-		}
+		let professorCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
+		professorCell.setup(self, placeholder: "Professor")
+		self.professorCell = professorCell
+		reviewCells.append(professorCell)
+		
+		let descriptionCell = tableView.dequeueReusableCellWithIdentifier("descriptionCell") as! DescriptionCell
+		descriptionCell.setup()
+		buyCells.append(descriptionCell)
+		sellCells.append(descriptionCell)
+		reviewCells.append(descriptionCell)
+		
 		loadAllSchools()
-		tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: .Automatic)
+	}
+	func getCells(selectedSegmentIndex index: Int) -> [UITableViewCell]
+	{
+		if index == 0
+		{
+			return buyCells
+		}
+		else if index == 1
+		{
+			return sellCells
+		}
+		else if index == 2
+		{
+			return reviewCells
+		}
+		else
+		{
+			assert(false)
+			return []
+		}
+	}
+	func setCells(selectedSegmentIndex index: Int)
+	{
+		if (allCells.count <= 0)
+		{
+			allCells.append(classPickerCells)
+			tableView.insertSections(NSIndexSet(index: 0), withRowAnimation: .Left)
+			allCells.append(getCells(selectedSegmentIndex: index))
+			tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Left)
+		}
+		else if (allCells.count == 1)
+		{
+			allCells.append(getCells(selectedSegmentIndex: index))
+			tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Left)
+		}
+		else if allCells.count == 2
+		{
+			let newCells = getCells(selectedSegmentIndex: index)
+			allCells.removeLast()
+			tableView.deleteSections(NSIndexSet(index: 1), withRowAnimation: .Fade)
+			allCells.append(newCells)
+			tableView.insertSections(NSIndexSet(index: 1), withRowAnimation: .Fade)
+		}
+		else
+		{
+			allCells.removeAll(keepCapacity: false)
+			setCells(selectedSegmentIndex: index)
+		}
 	}
 	func setPickerCells(theClass: AnyClass?)
 	{
@@ -458,87 +485,96 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 	}
 	func numberOfSectionsInTableView(tableView: UITableView) -> Int
 	{
-		return 1
+		return composing ? (allCells.count >= 2 ? 2 : allCells.count) : (allCells.count >= 1 ? 1 : allCells.count)
 	}
 	func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
 	{
-		return tableCells.count
+		return (allCells[section]).count
 	}
 	func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
 	{
-		return tableCells[indexPath.row]
+		return allCells[indexPath.section][indexPath.row]
 	}
 	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
 	{
 		var newIndexPath = indexPath
 		selectedCell = nil
 		dimCells()
-		for (i,cell) in enumerate(tableCells)
+		if (allCells.count > 0)
 		{
-			if (cell is PriceCell)
+			for (i,cell) in enumerate(allCells[0])
 			{
-				if ((cell as! PriceCell).textField.isFirstResponder())
+				if cell is PickerCell
 				{
-					(cell as! PriceCell).textField.resignFirstResponder()
-					if (newIndexPath.row == i)
+					allCells[0].removeAtIndex(i)
+					classPickerCells.removeAtIndex(i)
+					tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: i, inSection: newIndexPath.section)], withRowAnimation: UITableViewRowAnimation.Left)
+					if (newIndexPath.row == i-1)
 					{
 						return
 					}
-				}
-			}
-			if (cell is PickerCell)
-			{
-				tableCells.removeAtIndex(i)
-				tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: i, inSection: newIndexPath.section)], withRowAnimation: UITableViewRowAnimation.Left)
-				
-				if (newIndexPath.row == i-1)
-				{
-					return
-				}
-				if (i < newIndexPath.row)
-				{
-					newIndexPath = NSIndexPath(forRow: newIndexPath.row - 1, inSection: newIndexPath.section)
+					if (i < newIndexPath.row)
+					{
+						newIndexPath = NSIndexPath(forRow: newIndexPath.row - 1, inSection: newIndexPath.section)
+					}
 				}
 			}
 		}
-		if let cell = tableView.cellForRowAtIndexPath(newIndexPath)
+		if let selectedCell = tableView.cellForRowAtIndexPath(newIndexPath)
 		{
-			if (cell is PriceCell)
+			if let cell = selectedCell as? TextFieldCell
 			{
-				(cell as! PriceCell).textField.becomeFirstResponder()
+				if cell.textField.isFirstResponder()
+				{
+					cell.textField.resignFirstResponder()
+				}
+				else
+				{
+					cell.textField.becomeFirstResponder()
+				}
 			}
-			if (cell is BuySellCell)
+			if let cell = selectedCell as? DescriptionCell
 			{
-				segmentControl.selectedSegmentIndex = segmentControl.numberOfSegments > segmentControl.selectedSegmentIndex + 1 ? segmentControl.selectedSegmentIndex + 1 : 0
+				if cell.textView.isFirstResponder()
+				{
+					cell.textView.resignFirstResponder()
+				}
+				else
+				{
+					cell.textView.becomeFirstResponder()
+				}
+			}
+			if let cell = selectedCell as? BuySellCell
+			{
+				cell.segmentControl.selectedSegmentIndex = cell.segmentControl.numberOfSegments > cell.segmentControl.selectedSegmentIndex + 1 ? cell.segmentControl.selectedSegmentIndex + 1 : 0
 				segmentChange(segmentControl)
 			}
-			if (cell is CustomDetailCell)
+			if let cell = selectedCell as? ConditionCell
+			{
+				cell.segmentControl.selectedSegmentIndex = cell.segmentControl.numberOfSegments > cell.segmentControl.selectedSegmentIndex + 1 ? cell.segmentControl.selectedSegmentIndex + 1 : 0
+			}
+			if let cell = selectedCell as? CustomDetailCell
 			{
 				let pickerCell = tableView.dequeueReusableCellWithIdentifier("pickerCell") as! PickerCell
-				
-				pickerCell.picker.layer.borderWidth = 1.0
-				pickerCell.picker.layer.borderColor = UIColor.umMaizeColor().CGColor
-				pickerCell.picker.layer.cornerRadius = 12.0
-				
-				pickerCell.picker.dataSource = self
-				pickerCell.picker.delegate = self
-				if (cell == schoolCell)
+				pickerCell.setup(self, delegate: self)
+				self.selectedCell = cell
+				var index : Int = 0
+				if (self.selectedCell == schoolCell)
 				{
-					selectedCell = schoolCell
-					pickerCell.picker.selectRow(currentSchoolIndex, inComponent: 0, animated: true)
+					index = currentSchoolIndex
 				}
-				if (cell == subjectCell)
+				else if (self.selectedCell == subjectCell)
 				{
-					selectedCell = subjectCell
-					pickerCell.picker.selectRow(currentSubjectIndex, inComponent: 0, animated: true)
+					index = currentSubjectIndex
 				}
-				if (cell == classCell)
+				else if (self.selectedCell == classCell)
 				{
-					selectedCell = classCell
-					pickerCell.picker.selectRow(currentClassIndex, inComponent: 0, animated: true)
+					index = currentClassIndex
 				}
+				pickerCell.picker.selectRow(index, inComponent: 0, animated: true)
 				pickerCell.picker.reloadAllComponents()
-				tableCells.insert(pickerCell, atIndex: newIndexPath.row+1)
+				allCells[0].insert(pickerCell, atIndex: newIndexPath.row + 1)
+				classPickerCells.insert(pickerCell, atIndex: newIndexPath.row + 1)
 				tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: newIndexPath.row + 1, inSection: newIndexPath.section)], withRowAnimation: UITableViewRowAnimation.Left)
 			}
 		}
@@ -546,7 +582,7 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 	}
 	func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat
 	{
-		if (tableCells[indexPath.row] is PickerCell || tableCells[indexPath.row] is DescriptionCell)
+		if (allCells[indexPath.section][indexPath.row] is PickerCell || allCells[indexPath.section][indexPath.row] is DescriptionCell)
 		{
 			return 178.0
 		}
@@ -562,6 +598,10 @@ extension SearchAndComposeViewController : UIPickerViewDataSource, UIPickerViewD
 	}
 	func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int
 	{
+		if pickerView == courseLoadPicker
+		{
+			return CourseLoad.Nil.rawValue + 1
+		}
 		if (selectedCell == schoolCell)
 		{
 			return schools.count
@@ -579,21 +619,31 @@ extension SearchAndComposeViewController : UIPickerViewDataSource, UIPickerViewD
 	func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView!) -> UIView
 	{
 		var string = "No data found."
-		if (selectedCell == schoolCell)
+		if (pickerView == courseLoadPicker)
 		{
-			string = schools[row].description
+			if let load = CourseLoad(rawValue: row)
+			{
+				string = load.description
+			}
 		}
-		else if (currentSchool.subjects.count > row && selectedCell == subjectCell)
+		else
 		{
-			string = currentSchool.subjects[row].description
-		}
-		else if (currentSubject.classes.count > row && selectedCell == classCell)
-		{
-			string = currentSubject.classes[row].description
-		}
-		if (string.isEmpty)
-		{
-			string = "No data found."
+			if (selectedCell == schoolCell)
+			{
+				string = schools[row].description
+			}
+			else if (currentSchool.subjects.count > row && selectedCell == subjectCell)
+			{
+				string = currentSchool.subjects[row].description
+			}
+			else if (currentSubject.classes.count > row && selectedCell == classCell)
+			{
+				string = currentSubject.classes[row].description
+			}
+			if (string.isEmpty)
+			{
+				string = "No data found."
+			}
 		}
 		if let label = view as? UILabel
 		{
@@ -618,7 +668,10 @@ extension SearchAndComposeViewController : UIPickerViewDataSource, UIPickerViewD
 	}
 	func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int)
 	{
-		
+		if (pickerView == courseLoadPicker)
+		{
+			return
+		}
 		if (selectedCell == schoolCell)
 		{
 			selectedCell?.valueLabel?.text = schools[row].description
@@ -643,8 +696,20 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 {
 	func findActiveField() -> UITableViewCell?
 	{
-		return tableCells.filter { ($0 is TextFieldCell && ($0 as! TextFieldCell).textField.isFirstResponder()) || ($0 is DescriptionCell && ($0 as! DescriptionCell).textView.isFirstResponder()) }.first
+		if allCells.count > 1
+		{
+			for cells in allCells
+			{
+				let filteredCells = cells.filter{ ($0 is TextFieldCell && ($0 as! TextFieldCell).textField.isFirstResponder()) || ($0 is DescriptionCell && ($0 as! DescriptionCell).textView.isFirstResponder()) }
+				if filteredCells.count > 0
+				{
+					return filteredCells.first
+				}
+			}
+		}
+		return nil
 	}
+	
 	func keyboardShown (notification: NSNotification)
 	{
 		var info = notification.userInfo!
@@ -657,7 +722,7 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 			rect.size.height -= keyboardSize.height
 			if let activeField = findActiveField()
 			{
-				if (!rect.contains(activeField.frame.origin))
+				if (!rect.contains(CGPoint(x: activeField.frame.midX, y: activeField.frame.maxY)))
 				{
 					tableView.scrollRectToVisible(activeField.frame, animated: true)
 				}
@@ -679,18 +744,21 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 	*/
 	func textFieldShouldReturn(textField: UITextField) -> Bool
 	{
-		for (i, cell) in enumerate(tableCells)
+		if allCells.count > 1
 		{
-			if (cell is TextFieldCell)
+			for (i, cell) in enumerate(allCells[1])
 			{
-				if (cell as! TextFieldCell).textField.isFirstResponder()
+				if (cell is TextFieldCell)
 				{
-					for j in i+1..<tableCells.count
+					if (cell as! TextFieldCell).textField.isFirstResponder()
 					{
-						(tableCells[j] as? TextFieldCell)?.textField.becomeFirstResponder()
+						for j in i+1..<allCells[1].count
+						{
+							(allCells[1][j] as? TextFieldCell)?.textField.becomeFirstResponder()
+							break
+						}
 						break
 					}
-					break
 				}
 			}
 		}

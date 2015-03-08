@@ -13,6 +13,12 @@ class AnyObjectForClass
 	var objectId: String?
 	var user : PFUser!
 	var forClass : Class! // Instead of using the class code this stores the actual Class object reference.
+	init(forClass someClass: Class)
+	{
+		objectId = nil
+		user = nil
+		forClass = someClass
+	}
 	init?(object: PFObject, forClass someClass: Class?)
 	{
 		objectId = object.objectId
@@ -34,7 +40,7 @@ class AnyObjectForClass
 			{
 				return nil
 			}
-			obj!.fetch()
+			//obj!.fetch()
 			actualClass = Class(object: obj!, subjectCode: obj!["subject"] as! String)
 		}
 		forClass = actualClass

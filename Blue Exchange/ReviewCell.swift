@@ -22,13 +22,23 @@ class ReviewCell: UICollectionViewCell
 		layer.borderWidth = 1.0
 		layer.cornerRadius = 12.0
 		backgroundColor = UIColor.clearColor()
-		var name = "Anonymous"
-		if review.user != nil && !review.anonymous
+		if review.average
 		{
-			review.user.fetchIfNeeded()
-			name = (review.user["firstName"] as? String ?? "John") + " " + (review.user["lastName"] as? String ?? "Doe")
+			user.text = "Average For Course"
+			stars.floatRatings = true
+			user.textColor = UIColor.redColor()
+			layer.borderColor = UIColor.umMaizeColor().CGColor
 		}
-		user.text = name
+		else
+		{
+			var name = "Anonymous"
+			if review.user != nil && !review.anonymous
+			{
+				name = (review.user["firstName"] as? String ?? "John") + " " + (review.user["lastName"] as? String ?? "Doe")
+			}
+			user.text = name
+			user.textColor = UIColor.whiteColor()
+		}
 		classLabel.text = "\(review.forClass.description)"
 		stars.emptyImage = UIImage(named: "star")!
 		stars.fullImage = UIImage(named: "star-highlighted")!
@@ -37,8 +47,7 @@ class ReviewCell: UICollectionViewCell
 		stars.halfRatings = true
 		stars.rating = review.rating
 		stars.editable = false
-		
-		//FIXME: Show stars for rating.
+		professor.text = review.professor
 		workload.text = review.courseLoad.description
 		reviewDescription.text = review.description
 	}

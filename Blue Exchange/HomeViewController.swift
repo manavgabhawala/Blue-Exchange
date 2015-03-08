@@ -20,6 +20,7 @@ class HomeViewController: UIViewController
 	var course : Class? = nil
 	var sellerOnly : Bool? = nil
 	let activityView = UIActivityIndicatorView(activityIndicatorStyle: .White)
+	
 	//MARK: - ViewControllerLifecycle
 	override func viewDidLoad()
 	{
@@ -41,37 +42,42 @@ class HomeViewController: UIViewController
 			presentViewController(alert, animated: true, completion: nil)
 			return
 		}
-		let query = PFQuery(className: "Textbook")
-		addSellerConstraintToQuery(query)
-		query.countObjectsInBackgroundWithBlock {(number, error) in
-			if (error == nil)
-			{
-				self.textbooksCount = min(Int(number), 40)
-				self.loadTextbooks()
-				self.subController.reloadTextbooks()
+		if (textbooksCount == 0 || textbooks.count != textbooksCount)
+		{
+			let query = PFQuery(className: "Textbook")
+			addSellerConstraintToQuery(query)
+			query.countObjectsInBackgroundWithBlock {(number, error) in
+				if (error == nil)
+				{
+					self.textbooksCount = min(Int(number), 40)
+					self.loadTextbooks()
+					self.subController.reloadTextbooks()
+				}
+				else
+				{
+					let alert = UIAlertController.errorAlertController(title: "Please Connect To The Internet", message: "This application requires a valid internet connection to function properly. Please establish a valid internet connection before trying to run this application.", error: error)
+					self.presentViewController(alert, animated: true, completion: nil)
+				}
+				
 			}
-			else
-			{
-				let alert = UIAlertController.errorAlertController(title: "Please Connect To The Internet", message: "This application requires a valid internet connection to function properly. Please establish a valid internet connection before trying to run this application.", error: error)
-				self.presentViewController(alert, animated: true, completion: nil)
-			}
-			
 		}
-		let otherQuery = PFQuery(className: "Review")
-		addCourseConstraintToQuery(otherQuery)
-		otherQuery.countObjectsInBackgroundWithBlock {(number, error) in
-			if (error == nil)
-			{
-				self.reviewsCount = min(Int(number), 40)
-				self.loadReviews()
-				self.subController.reloadReviews()
+		if (reviewsCount == 0 || reviews.count != reviewsCount)
+		{
+			let otherQuery = PFQuery(className: "Review")
+			addCourseConstraintToQuery(otherQuery)
+			otherQuery.countObjectsInBackgroundWithBlock {(number, error) in
+				if (error == nil)
+				{
+					self.reviewsCount = min(Int(number), 40)
+					self.loadReviews()
+					self.subController.reloadReviews()
+				}
+				else
+				{
+					let alert = UIAlertController.errorAlertController(title: "Please Connect To The Internet", message: "This application requires a valid internet connection to function properly. Please establish a valid internet connection before trying to run this application.", error: error)
+					self.presentViewController(alert, animated: true, completion: nil)
+				}
 			}
-			else
-			{
-				let alert = UIAlertController.errorAlertController(title: "Please Connect To The Internet", message: "This application requires a valid internet connection to function properly. Please establish a valid internet connection before trying to run this application.", error: error)
-				self.presentViewController(alert, animated: true, completion: nil)
-			}
-			
 		}
 		if PFUser.currentUser() == nil
 		{
@@ -95,6 +101,7 @@ class HomeViewController: UIViewController
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+	
 	//MARK: - Parse Interaction
 	func loadTextbooks()
 	{
@@ -103,21 +110,21 @@ class HomeViewController: UIViewController
 			let query = PFQuery(className: "Textbook")
 			addSellerConstraintToQuery(query)
 			query.limit = textbooksCount
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-				query.findObjectsInBackgroundWithBlock{(results, error) in
-					self.loadEnd()
-					if (results != nil && error == nil)
-					{
-						self.textbooks.append((results as! [PFObject]).map { Textbook(object: $0, forClass: nil) }.filter { $0 != nil} .map { $0! })
-						dispatch_async(dispatch_get_main_queue(), { self.subController.reloadTextbooks() })
-					}
-					else
-					{
-						let alertController = UIAlertController.errorAlertController(title: "An Error Occurred While Loading Textbooks", message: nil, error: error)
-						self.presentViewController(alertController, animated: true, completion: nil)
-					}
+			query.includeKey("user")
+			query.includeKey("course")
+			query.findObjectsInBackgroundWithBlock{(results, error) in
+				self.loadEnd()
+				if (results != nil && error == nil)
+				{
+					self.textbooks = (results as! [PFObject]).map { Textbook(object: $0, forClass: Class(object: $0["course"] as! PFObject, subjectCode: ($0["course"] as! PFObject)["subject"] as! String)) }.filter { $0 != nil} .map { $0! }
+					self.subController.reloadTextbooks()
 				}
-			})
+				else
+				{
+					let alertController = UIAlertController.errorAlertController(title: "An Error Occurred While Loading Textbooks", message: nil, error: error)
+					self.presentViewController(alertController, animated: true, completion: nil)
+				}
+			}
 		}
 		else
 		{
@@ -126,7 +133,10 @@ class HomeViewController: UIViewController
 	}
 	func loadEnd()
 	{
-		UIApplication.sharedApplication().endIgnoringInteractionEvents()
+		if UIApplication.sharedApplication().isIgnoringInteractionEvents()
+		{
+			UIApplication.sharedApplication().endIgnoringInteractionEvents()
+		}
 		self.activityView.stopAnimating()
 		self.activityView.removeFromSuperview()
 	}
@@ -137,20 +147,25 @@ class HomeViewController: UIViewController
 			let query = PFQuery(className: "Review")
 			addCourseConstraintToQuery(query)
 			query.limit = reviewsCount
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-				query.findObjectsInBackgroundWithBlock{(results, error) in
-					if (results != nil && error == nil)
+			query.includeKey("user")
+			query.includeKey("course")
+			query.findObjectsInBackgroundWithBlock{(results, error) in
+				if (results != nil && error == nil)
+				{
+					self.reviews = (results as! [PFObject]).map { Review(object: $0, forClass: Class(object: $0["course"] as! PFObject, subjectCode: ($0["course"] as! PFObject)["subject"] as! String)) }.filter { $0 != nil }.map { $0! }
+					if (self.course != nil) && (self.reviews.count > 0)
 					{
-						self.reviews.append((results as! [PFObject]).map { Review(object: $0, forClass: nil) }.filter { $0 != nil} .map { $0! })
-						dispatch_async(dispatch_get_main_queue(), { self.subController.reloadReviews() })
+						self.reviews.insert(Review.createAverageReview(self.reviews), atIndex: 0)
+						self.reviewsCount! += 1
 					}
-					else
-					{
-						let alertController = UIAlertController.errorAlertController(title: "An Error Occurred While Loading Reviews", message: nil, error: error)
-						self.presentViewController(alertController, animated: true, completion: nil)
-					}
+					self.subController.reloadReviews()
 				}
-			})
+				else
+				{
+					let alertController = UIAlertController.errorAlertController(title: "An Error Occurred While Loading Reviews", message: nil, error: error)
+					self.presentViewController(alertController, animated: true, completion: nil)
+				}
+			}
 		}
 	}
 	func addCourseConstraintToQuery(query: PFQuery!)

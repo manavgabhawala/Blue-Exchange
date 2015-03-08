@@ -328,3 +328,10 @@ func isConnectedToInternet() -> Bool
 	let needsConnection = (flags & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
 	return (isReachable && !needsConnection)
 }
+
+typealias TableSectionCells = [UITableViewCell]
+
+func allKeysForValue<K, V : Equatable>(dict: [K : V], val: V) -> [K]
+{
+	return map(filter(dict) { $1 == val }) { $0.0 }
+}

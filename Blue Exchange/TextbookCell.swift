@@ -26,7 +26,6 @@ class TextbookCell: UICollectionViewCell
 		var name = "Anonymous"
 		if textbook.user != nil
 		{
-			textbook.user.fetchIfNeeded()
 			name = (textbook.user["firstName"] as? String ?? "John") + " " + (textbook.user["lastName"] as? String ?? "Doe")
 		}
 		user.text = name

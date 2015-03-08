@@ -23,7 +23,6 @@ import UIKit
 /**
 A simple rating view that can set whole, half or floating point ratings.
 */
-@IBDesignable
 public class RatingView: UIView {
 	
     // MARK: Float Rating View properties
@@ -43,7 +42,7 @@ public class RatingView: UIView {
     /**
     Sets the empty image (e.g. a star outline)
     */
-    @IBInspectable public var emptyImage: UIImage? {
+    public var emptyImage: UIImage? {
         didSet {
             // Update empty image views
             for imageView in emptyImageViews {
@@ -57,7 +56,7 @@ public class RatingView: UIView {
     Sets the full image that is overlayed on top of the empty image.
     Should be same size and shape as the empty image.
     */
-    @IBInspectable public var fullImage: UIImage? {
+    public var fullImage: UIImage? {
         didSet {
             // Update full image views
             for imageView in fullImageViews {
@@ -75,7 +74,7 @@ public class RatingView: UIView {
     /**
     Minimum rating.
     */
-    @IBInspectable public var minRating: Int  = 0 {
+    public var minRating: Int  = 0 {
         didSet {
             // Update current rating if needed
             if rating < Float(minRating) {
@@ -88,7 +87,7 @@ public class RatingView: UIView {
     /**
     Max rating value.
     */
-    @IBInspectable public var maxRating: Int = 5 {
+    public var maxRating: Int = 5 {
         didSet {
             let needsRefresh = maxRating != oldValue
             
@@ -106,12 +105,12 @@ public class RatingView: UIView {
     /**
     Minimum image size.
     */
-    @IBInspectable public var minImageSize: CGSize = CGSize(width: 5.0, height: 5.0)
+    public var minImageSize: CGSize = CGSize(width: 5.0, height: 5.0)
     
     /**
     Set the current rating.
     */
-    @IBInspectable public var rating: Float = 0 {
+	public var rating: Float = 0 {
         didSet {
             if rating != oldValue {
                 refresh()
@@ -122,17 +121,17 @@ public class RatingView: UIView {
     /**
     Sets whether or not the rating view can be changed by panning.
     */
-    @IBInspectable public var editable: Bool = true
+    public var editable: Bool = true
     
     /**
     Ratings change by 0.5. Takes priority over floatRatings property.
     */
-    @IBInspectable public var halfRatings: Bool = false
+    public var halfRatings: Bool = false
     
     /**
     Ratings change by floating point values.
     */
-    @IBInspectable public var floatRatings: Bool = false
+    public var floatRatings: Bool = false
     
     
     // MARK: Initializations
