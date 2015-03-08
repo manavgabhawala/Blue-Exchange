@@ -12,5 +12,6 @@ import UIKit
 */
 class ShowPhoneNumber: UITableViewCell
 {
+	@IBOutlet var label : UILabel!
 	@IBOutlet var numberSwitch : UISwitch!
 }

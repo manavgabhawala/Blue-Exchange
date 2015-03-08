@@ -923,6 +923,7 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <connections>
+                                            <outlet property="label" destination="YZ1-eE-cND" id="yIg-Hq-hD1"/>
                                             <outlet property="numberSwitch" destination="t5U-m0-6Y7" id="wLb-ds-MhC"/>
                                         </connections>
                                     </tableViewCell>

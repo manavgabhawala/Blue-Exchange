@@ -184,6 +184,8 @@ class SearchAndComposeViewController: UIViewController
 				{
 					review["workload"] = load
 				}
+				let anonymous = (allCells[1].filter { $0 is ShowPhoneNumber }.first! as! ShowPhoneNumber).numberSwitch.on
+				review["anonymous"] = anonymous
 				let professor = professorCell.textField.text.isEmpty ? nil : professorCell.textField.text
 				if professor != nil { review["professor"] = professor }
 				review.saveInBackgroundWithBlock {(result, error) in
@@ -198,7 +200,6 @@ class SearchAndComposeViewController: UIViewController
 						self.presentViewController(alert, animated: true, completion: nil)
 					}
 				}
-				println("Will save object here")
 			}
 			else
 			{
@@ -227,7 +228,7 @@ class SearchAndComposeViewController: UIViewController
 					let textbook = PFObject(className: "Textbook")
 					textbook["user"] = user
 					textbook["course"] = PFObject(withoutDataWithClassName: "Classes", objectId: currentClass.objectId)
-					textbook["class"] = "\(currentClass.subject?.code ?? currentClass.subjectCode)\(currentClass.catalogNumber)"
+					textbook["class"] = "\(currentClass.subject?.code ?? currentClass.subjectCode!)\(currentClass.catalogNumber!)"
 					textbook["showPhoneNumber"] = showPhoneNumber
 					textbook["price"] = price
 					textbook["selling"] = selling
@@ -489,7 +490,12 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 		courseLoadPicker = courseLoad.picker
 		
 		reviewCells.append(courseLoad)
-				
+		
+		let anonoymousCell = tableView.dequeueReusableCellWithIdentifier("phoneNumberCell") as! ShowPhoneNumber
+		anonoymousCell.label.text = "Remain Anonymous"
+		anonoymousCell.numberSwitch.on = false
+		reviewCells.append(anonoymousCell)
+		
 		let professorCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
 		professorCell.setup(self, placeholder: "Professor")
 		self.professorCell = professorCell
