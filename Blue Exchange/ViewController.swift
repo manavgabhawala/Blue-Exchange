@@ -133,11 +133,6 @@ extension ViewController
 				textFields[Fields.Email.rawValue].shakeForInvalidInput()
 				shouldReturn = true
 			}
-			if (Array(textFields[Fields.PhoneNumber.rawValue].text).count > 0 || Array(textFields[Fields.PhoneNumber.rawValue].text).count < 10)
-			{
-				textFields[Fields.PhoneNumber.rawValue].shakeForInvalidInput()
-				shouldReturn = true
-			}
 			if (Array(textFields[Fields.Password.rawValue].text).count < 6)
 			{
 				textFields[Fields.Password.rawValue].shakeForInvalidInput()
@@ -156,7 +151,7 @@ extension ViewController
 			user.username = textFields[Fields.Email.rawValue].text
 			user.password = textFields[Fields.Password.rawValue].text
 			user.email = textFields[Fields.Email.rawValue].text
-			user["phone"] = (textFields[Fields.PhoneNumber.rawValue].text.returnActualNumber() as NSString).doubleValue
+			user["phone"] = textFields[Fields.PhoneNumber.rawValue].text.returnActualNumber().toInt() ?? 0
 			user["firstName"] = textFields[Fields.FirstName.rawValue].text
 			user["lastName"] = textFields[Fields.LastName.rawValue].text
 			user.signUpInBackgroundWithBlock {(completed, error) in
