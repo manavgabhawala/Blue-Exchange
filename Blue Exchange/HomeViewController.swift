@@ -21,12 +21,13 @@ class HomeViewController: UIViewController
 	var sellerOnly : Bool? = nil
 	let activityView = UIActivityIndicatorView(activityIndicatorStyle: .White)
 	var schools = [School]()
+	var deleteMode = false
 	
 	//MARK: - ViewControllerLifecycle
 	override func viewDidLoad()
 	{
         super.viewDidLoad()
-		subController = storyboard!.instantiateViewControllerWithIdentifier("CollectionsViewController") as! CollectionsViewController
+		subController = storyboard!.instantiateViewControllerWithIdentifier("CollectionsViewController") as CollectionsViewController
 		subController.delegate = self
 		container.addSubview(subController.view)
 		UIApplication.sharedApplication().beginIgnoringInteractionEvents()
@@ -51,6 +52,7 @@ class HomeViewController: UIViewController
 		{
 			let query = PFQuery(className: "Textbook")
 			addSellerConstraintToQuery(query)
+			addUserContstraintToQuery(query)
 			query.countObjectsInBackgroundWithBlock {(number, error) in
 				if (error == nil)
 				{
@@ -70,6 +72,7 @@ class HomeViewController: UIViewController
 		{
 			let otherQuery = PFQuery(className: "Review")
 			addCourseConstraintToQuery(otherQuery)
+			addUserContstraintToQuery(otherQuery)
 			otherQuery.countObjectsInBackgroundWithBlock {(number, error) in
 				if (error == nil)
 				{
@@ -114,6 +117,7 @@ class HomeViewController: UIViewController
 		{
 			let query = PFQuery(className: "Textbook")
 			addSellerConstraintToQuery(query)
+			addUserContstraintToQuery(query)
 			query.limit = textbooksCount
 			query.includeKey("user")
 			query.includeKey("course")
@@ -121,7 +125,7 @@ class HomeViewController: UIViewController
 				self.loadEnd()
 				if (results != nil && error == nil)
 				{
-					self.textbooks = (results as! [PFObject]).map { Textbook(object: $0, forClass: Class(object: $0["course"] as! PFObject, subjectCode: ($0["course"] as! PFObject)["subject"] as! String)) }.filter { $0 != nil} .map { $0! }
+					self.textbooks = (results as [PFObject]).map { Textbook(object: $0, forClass: Class(object: $0["course"] as PFObject, subjectCode: ($0["course"] as PFObject)["subject"] as String)) }.filter { $0 != nil} .map { $0! }
 					self.subController.reloadTextbooks()
 				}
 				else
@@ -151,13 +155,14 @@ class HomeViewController: UIViewController
 		{
 			let query = PFQuery(className: "Review")
 			addCourseConstraintToQuery(query)
+			addUserContstraintToQuery(query)
 			query.limit = reviewsCount
 			query.includeKey("user")
 			query.includeKey("course")
 			query.findObjectsInBackgroundWithBlock{(results, error) in
 				if (results != nil && error == nil)
 				{
-					self.reviews = (results as! [PFObject]).map { Review(object: $0, forClass: Class(object: $0["course"] as! PFObject, subjectCode: ($0["course"] as! PFObject)["subject"] as! String)) }.filter { $0 != nil }.map { $0! }
+					self.reviews = (results as [PFObject]).map { Review(object: $0, forClass: Class(object: $0["course"] as PFObject, subjectCode: ($0["course"] as PFObject)["subject"] as String)) }.filter { $0 != nil }.map { $0! }
 					if (self.course != nil) && (self.reviews.count > 0)
 					{
 						self.reviews.insert(Review.createAverageReview(self.reviews), atIndex: 0)
@@ -190,10 +195,17 @@ class HomeViewController: UIViewController
 		}
 		addCourseConstraintToQuery(query)
 	}
+	func addUserContstraintToQuery(query: PFQuery!)
+	{
+		if deleteMode
+		{
+			query.whereKey("user", equalTo: PFUser.currentUser())
+		}
+	}
 	//MARK: - Actions
 	@IBAction func searchButton(_: UIBarButtonItem)
 	{
-		let searchController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as! SearchAndComposeViewController
+		let searchController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as SearchAndComposeViewController
 		searchController.schools = schools
 		searchController.composing = false
 		searchController.sender = self
@@ -201,7 +213,7 @@ class HomeViewController: UIViewController
 	}
 	@IBAction func composeButton(_: UIBarButtonItem)
 	{
-		let composeController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as! SearchAndComposeViewController
+		let composeController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as SearchAndComposeViewController
 		composeController.composing = true
 		composeController.schools = schools
 		composeController.sender = self
@@ -209,7 +221,10 @@ class HomeViewController: UIViewController
 	}
 	@IBAction func profileButton(_: UIBarButtonItem)
 	{
-		
+		let navigation = storyboard!.instantiateViewControllerWithIdentifier("ProfileViewController") as UINavigationController
+		navigation.modalPresentationStyle = .FullScreen
+		navigation.modalTransitionStyle = .CoverVertical
+		presentViewController(navigation, animated: true, completion: nil)
 	}
 }
 
@@ -245,4 +260,17 @@ extension HomeViewController : CollectionsViewControllerDelegate
 			return nil
 		}
 	}
+	func getDeleteMode() -> Bool
+	{
+		return deleteMode
+	}
+	func removeTextbookAtIndex(index: Int)
+	{
+		--textbooksCount!
+		textbooks.removeAtIndex(index)
+	}
+	func removeReviewAtIndex(index: Int)
+	{
+		--reviewsCount!
+		reviews.removeAtIndex(index)	}
 }

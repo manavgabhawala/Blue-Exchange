@@ -65,7 +65,7 @@ extension String
 	*/
 	subscript (i: Int) -> String
 	{
-		if count(self) > i
+		if countElements(self) > i
 		{
 			return String(Array(self)[i])
 		}
@@ -111,24 +111,24 @@ extension String
 		returnString = returnString.returnActualNumber()
 		
 		//Formats mobile number with parentheses and spaces
-		if (count(returnString) <= 10)
+		if (countElements(returnString) <= 10)
 		{
-			if (count(returnString) > 6)
+			if (countElements(returnString) > 6)
 			{
 				returnString = returnString.stringByReplacingCharactersInRange(Range<String.Index>(start: returnString.indexAt(6), end: returnString.indexAt(6)), withString: "-")
 			}
-			if (count(returnString) > 3)
+			if (countElements(returnString) > 3)
 			{
 				returnString = returnString.stringByReplacingCharactersInRange(Range<String.Index>(start: returnString.indexAt(3), end: returnString.indexAt(3)), withString: ") ")
 			}
-			if (count(returnString) > 0)
+			if (countElements(returnString) > 0)
 			{
 				returnString = returnString.stringByReplacingCharactersInRange(Range<String.Index>(start: returnString.indexAt(0), end: returnString.indexAt(0)), withString: "(")
 			}
 		}
 		else
 		{
-			returnString = "+" + ((returnString as NSString).substringToIndex(count(returnString) - 10) as String) + " " + ((returnString as NSString).substringFromIndex(count(returnString) - 10) as String).returnMaskedPhoneText()
+			returnString = "+" + ((returnString as NSString).substringToIndex(countElements(returnString) - 10) as String) + " " + ((returnString as NSString).substringFromIndex(countElements(returnString) - 10) as String).returnMaskedPhoneText()
 		}
 		return returnString
 	}
@@ -169,7 +169,7 @@ extension String
 			return false;
 		}
 		let regex = NSRegularExpression(pattern: "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", options: .CaseInsensitive, error: nil)
-		return regex?.firstMatchInString(self, options: nil, range: NSMakeRange(0, count(self))) != nil
+		return regex?.firstMatchInString(self, options: nil, range: NSMakeRange(0, countElements(self))) != nil
 	}
 	
 	/**
@@ -199,7 +199,7 @@ extension String
 		self.enumerateSubstringsInRange(range, options: .BySentences, {(sentence, sentenceRange, enclosingRange, stop) in
 			formattedString += sentence.stringByReplacingCharactersInRange(Range(start: self.startIndex, end: advance(self.startIndex, 1)), withString: sentence[0].uppercaseString)
 		})
-		if (formattedString[count(formattedString) - 1] != ".")
+		if (formattedString[countElements(formattedString) - 1] != ".")
 		{
 			formattedString += "."
 		}
@@ -309,7 +309,8 @@ func generateRandomBackground(size: CGSize) -> UIView
 
 func isConnectedToInternet() -> Bool
 {
-	var zeroAddress = sockaddr_in()
+	let zero : Int8 = 0
+	var zeroAddress = sockaddr_in(sin_len: 0, sin_family: 0, sin_port: 0, sin_addr: in_addr(s_addr: 0), sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
 	zeroAddress.sin_len = UInt8(sizeof(sockaddr_in.Type))
 	zeroAddress.sin_family = UInt8(AF_INET)
 	zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))

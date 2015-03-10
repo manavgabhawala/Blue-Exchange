@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		821FDDA91AAD18BB007AEB9E /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821FDDA81AAD18BB007AEB9E /* ProfileViewController.swift */; };
+		821FDDAB1AAD30E6007AEB9E /* profile-placeholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 821FDDAA1AAD30E6007AEB9E /* profile-placeholder.jpg */; };
+		821FDDAC1AAD30E6007AEB9E /* profile-placeholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 821FDDAA1AAD30E6007AEB9E /* profile-placeholder.jpg */; };
 		827E44121AA7DFC10006F062 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827E44111AA7DFC10006F062 /* AppDelegate.swift */; };
 		827E44141AA7DFC10006F062 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827E44131AA7DFC10006F062 /* ViewController.swift */; };
 		827E44171AA7DFC10006F062 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 827E44151AA7DFC10006F062 /* Main.storyboard */; };
@@ -96,6 +99,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		821FDDA81AAD18BB007AEB9E /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		821FDDAA1AAD30E6007AEB9E /* profile-placeholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "profile-placeholder.jpg"; sourceTree = "<group>"; };
 		827E440C1AA7DFC10006F062 /* Blue Exchange.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Blue Exchange.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		827E44101AA7DFC10006F062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		827E44111AA7DFC10006F062 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -214,6 +219,7 @@
 				827E44151AA7DFC10006F062 /* Main.storyboard */,
 				82E7F9681AA8EF2400A7813B /* HomeViewController.swift */,
 				82E7F96B1AA8F70700A7813B /* CollectionsViewController.swift */,
+				821FDDA81AAD18BB007AEB9E /* ProfileViewController.swift */,
 				82B3F7601AAA4EC500152B05 /* SearchAndComposeViewController.swift */,
 				82E7F9871AA92DE200A7813B /* Views */,
 				82E7F97A1AA8F80600A7813B /* Model */,
@@ -226,6 +232,7 @@
 		827E440F1AA7DFC10006F062 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				821FDDAA1AAD30E6007AEB9E /* profile-placeholder.jpg */,
 				827E44B61AA7EB2A0006F062 /* Blue Exchange-Bridging-Header.h */,
 				827E44371AA7E3120006F062 /* Background1.jpg */,
 				827E44381AA7E3120006F062 /* Background2.jpg */,
@@ -398,6 +405,7 @@
 				827E443B1AA7E3120006F062 /* Background2.jpg in Resources */,
 				827E44391AA7E3120006F062 /* Background1.jpg in Resources */,
 				827E44421AA7E5700006F062 /* Launch Screen.xib in Resources */,
+				821FDDAB1AAD30E6007AEB9E /* profile-placeholder.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +413,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				821FDDAC1AAD30E6007AEB9E /* profile-placeholder.jpg in Resources */,
 				827E443C1AA7E3120006F062 /* Background2.jpg in Resources */,
 				827E443A1AA7E3120006F062 /* Background1.jpg in Resources */,
 				827E44401AA7E4C70006F062 /* Main.storyboard in Resources */,
@@ -441,6 +450,7 @@
 				82E7F97F1AA91DE900A7813B /* AnyObjectForClass.swift in Sources */,
 				82FC38261AAAFB1400FE4B35 /* RatingView.swift in Sources */,
 				82B3F76E1AAA503D00152B05 /* PriceCell.swift in Sources */,
+				821FDDA91AAD18BB007AEB9E /* ProfileViewController.swift in Sources */,
 				82E7F9721AA8F7FE00A7813B /* Textbook.swift in Sources */,
 				82B3F7701AAA503D00152B05 /* TextFieldCell.swift in Sources */,
 			);
@@ -603,6 +613,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Blue Exchange/Blue Exchange-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -626,6 +637,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Blue Exchange/Blue Exchange-Bridging-Header.h";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -644,6 +656,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Blue ExchangeTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -667,6 +680,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = "Blue ExchangeTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

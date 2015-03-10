@@ -7,7 +7,10 @@
 //
 
 import UIKit
-
+protocol ReviewCellDelegate: AnyObjectForClassCellDelegate
+{
+	func description(review: Review)
+}
 class ReviewCell: UICollectionViewCell
 {
 	@IBOutlet var classLabel : UILabel!
@@ -15,13 +18,23 @@ class ReviewCell: UICollectionViewCell
 	@IBOutlet var user : UILabel!
 	@IBOutlet var stars : RatingView!
 	@IBOutlet var workload : UILabel!
-	@IBOutlet var reviewDescription : UILabel!
-	func setDetails(review: Review)
+	@IBOutlet var flagButton: UIButton!
+	var review : Review!
+	var delegate: ReviewCellDelegate?
+	var deleteMode = false
+	func setDetails(review: Review, delegate: ReviewCellDelegate?, deleteMode: Bool)
 	{
+		self.delegate = delegate
+		self.review = review
 		layer.borderColor = UIColor(white: 1.0, alpha: 0.55).CGColor
 		layer.borderWidth = 1.0
 		layer.cornerRadius = 12.0
 		backgroundColor = UIColor.clearColor()
+		if deleteMode
+		{
+			flagButton.setTitle("⌫", forState: .Normal)
+			flagButton.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 22.0)!
+		}
 		if review.average
 		{
 			user.text = "Average For Course"
@@ -49,6 +62,13 @@ class ReviewCell: UICollectionViewCell
 		stars.editable = false
 		professor.text = review.professor
 		workload.text = review.courseLoad.description
-		reviewDescription.text = review.description
+	}
+	@IBAction func flagObject(sender: UIButton)
+	{
+		delegate?.flag(review.objectId, className: "Review", sender: sender)
+	}
+	@IBAction func description(_: UIButton)
+	{
+		delegate?.description(review)
 	}
 }

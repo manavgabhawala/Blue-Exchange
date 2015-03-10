@@ -13,8 +13,8 @@ import Foundation
 */
 enum CourseLoad : Int, Printable
 {
-	case VeryEasy = 0
-	case Easy, Medium, Difficult, VeryDifficult, InsanelyDifficult
+	case Easy = 0
+	case Medium, Difficult, InsanelyDifficult
 	case Nil
 	var description : String
 	{
@@ -22,18 +22,14 @@ enum CourseLoad : Int, Printable
 		{
 			switch self
 			{
-			case .VeryEasy:
-				return "Very Easy"
 			case .Easy:
-				return "Easy"
+				return "Easy A"
 			case .Medium:
-				return "Medium"
+				return "Moderate"
 			case .Difficult:
-				return "Difficult"
-			case .VeryDifficult:
-				return "Very Difficult"
+				return "Heavy"
 			case .InsanelyDifficult:
-				return "Insanenly Difficult"
+				return "You Will Die..."
 			default:
 				return "Undefined"
 			}
@@ -75,21 +71,7 @@ class Review : AnyObjectForClass
 		let courseLoadAverage : Float = courseLoads.count > 0 ? courseLoads.reduce(courseLoads.first!, combine: { ($0.0 + $0.1) / 2}) : 6
 		let averageLoad = Int(round(courseLoadAverage))
 		var map = [String: Int]()
-		for professor in (reviews.map { $0.professor.lowercaseString })
-		{
-			if (professor != "not mentioned")
-			{
-				if map[professor] != nil
-				{
-					map[professor]! += 1
-				}
-				else
-				{
-					map[professor] = 1
-				}
-			}
-		}
-		let highestProfessor = allKeysForValue(map,  maxElement(map.values)).first ?? "Unknown"
+		let highestProfessor = "Not Applicable"
 		return Review(forClass: reviews.first!.forClass, rating: reviews.reduce(reviews.first!.rating, combine: { ($0.0 + $0.1.rating) / 2 }), courseLoad: CourseLoad(rawValue: averageLoad), professor: highestProfessor.capitalizedString)
 	}
 }

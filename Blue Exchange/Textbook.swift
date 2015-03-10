@@ -27,6 +27,7 @@ class Textbook : AnyObjectForClass
 		super.init(object: object, forClass: someClass)
 		selling = object["selling"] as? Bool ?? false
 		price = object["price"] as? Float ?? 50.00
+		showPhoneNumber = object["showPhoneNumber"] as? Bool ?? false
 		title = object["title"] as? String ?? "No Title Available"
 		title = title.isEmpty ? "No Title Available" : title
 		condition = object["condition"] as? String ?? "None"

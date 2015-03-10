@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Override point for customization after application launch.
 		UIApplication.sharedApplication().statusBarStyle = .LightContent
 		Parse.enableLocalDatastore()
-		Parse.setApplicationId("7ybxS3opTh2dYIeo0DLDguiqpvmtlanXoSCZzIdw", clientKey: "xgenFXtatwsewpQ4YQiPXxC8V3qjPb9JbrFPls9n")
+		Parse.setApplicationId("Hv2s5UNlCaykyL5JxX5EIGYaxQrXAV6Ci2W6TikL", clientKey: "nmVHe8v5c9pmDz9Wvh8o7zWQNKO88WVmtyKL56Hy")
 		let userNotificationTypes = (UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound)
 		let settings = UIUserNotificationSettings(forTypes: userNotificationTypes, categories: nil)
 		application.registerUserNotificationSettings(settings)
@@ -75,7 +75,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		PFPush.handlePush(userInfo)
 	}
 	
-	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool {
+	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool
+	{
 		// You can add your app-specific url handling code here if needed
 		return FBAppCall.handleOpenURL(url, sourceApplication: sourceApplication)
 	}

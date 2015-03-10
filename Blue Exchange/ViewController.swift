@@ -230,7 +230,7 @@ extension ViewController
 	func emptyScrollViewTowardsRight(right: Bool)
 	{
 		let _ :[Void] = scrollView.subviews.filter { !($0 is UIImageView) }.map {
-			let view = $0 as! UIView
+			let view = $0 as UIView
 			UIView.animateWithDuration(1.0, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: .CurveEaseInOut, animations: {
 				if (right)
 				{
@@ -479,7 +479,7 @@ extension ViewController : UITextFieldDelegate
 			{
 				var isEndOfString = false
 				let currentCurserPositionInteger = textField.offsetFromPosition(textField.beginningOfDocument, toPosition: currentCursorPosition.start)
-				if currentCurserPositionInteger == count(textField.text)
+				if currentCurserPositionInteger == countElements(textField.text)
 				{
 					isEndOfString = true
 				}

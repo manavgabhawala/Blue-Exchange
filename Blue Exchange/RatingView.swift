@@ -300,23 +300,23 @@ public class RatingView: UIView {
 		delegate?.floatRatingView?(self, isUpdating: rating)
     }
     
-	public override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
+	public override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
 	{
-		if let touch = touches.first as? UITouch
+		if let touch = touches.anyObject() as? UITouch
 		{
 			let touchLocation = touch.locationInView(self)
 			handleTouchAtLocation(touchLocation)
 		}
 	}
-	public override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent)
+	public override func touchesMoved(touches: NSSet, withEvent event: UIEvent)
 	{
-		if let touch = touches.first as? UITouch
+		if let touch = touches.anyObject() as? UITouch
 		{
 			let touchLocation = touch.locationInView(self)
 			handleTouchAtLocation(touchLocation)
 		}
 	}
-	public override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent)
+	public override func touchesEnded(touches: NSSet, withEvent event: UIEvent)
 	{
 		delegate?.floatRatingView(self, didUpdate: rating)
 	}
