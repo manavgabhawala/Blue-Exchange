@@ -183,7 +183,7 @@ extension ViewController
 			}
 			PFUser.logInWithUsernameInBackground(textFields.first!.text, password: textFields.last!.text)
 			{ (user: PFUser!, error: NSError!) -> Void in
-				if user != nil && error != nil
+				if user != nil && error == nil
 				{
 					let currentInstallation = PFInstallation.currentInstallation()
 					currentInstallation["user"] = user
