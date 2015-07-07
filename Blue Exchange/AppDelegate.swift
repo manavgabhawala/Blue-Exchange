@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Override point for customization after application launch.
 		UIApplication.sharedApplication().statusBarStyle = .LightContent
 		Parse.enableLocalDatastore()
-		Parse.setApplicationId("Hv2s5UNlCaykyL5JxX5EIGYaxQrXAV6Ci2W6TikL", clientKey: "nmVHe8v5c9pmDz9Wvh8o7zWQNKO88WVmtyKL56Hy")
+		Parse.setApplicationId("xxxx", clientKey: "xxxx")
 		let userNotificationTypes = (UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound)
 		let settings = UIUserNotificationSettings(forTypes: userNotificationTypes, categories: nil)
 		application.registerUserNotificationSettings(settings)
