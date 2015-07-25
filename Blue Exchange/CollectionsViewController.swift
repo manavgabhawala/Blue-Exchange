@@ -68,7 +68,7 @@ extension CollectionsViewController : UICollectionViewDataSource, UICollectionVi
 		{
 			if let textbook = delegate?.textbookForIndex(indexPath.row)
 			{
-				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("textbookCell", forIndexPath: indexPath) as TextbookCell
+				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("textbookCell", forIndexPath: indexPath) as! TextbookCell
 				cell.setDetails(textbook, delegate: self, deleteMode: delegate?.getDeleteMode() ?? false)
 				return cell
 			}
@@ -79,7 +79,7 @@ extension CollectionsViewController : UICollectionViewDataSource, UICollectionVi
 				{
 					text = "No Results Found"
 				}
-				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("emptyCell", forIndexPath: indexPath) as EmptyCell
+				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("emptyCell", forIndexPath: indexPath) as! EmptyCell
 				cell.label.text = text
 				cell.setup()
 				return cell
@@ -89,7 +89,7 @@ extension CollectionsViewController : UICollectionViewDataSource, UICollectionVi
 		{
 			if let review = delegate?.reviewForIndex(indexPath.row)
 			{
-				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("reviewCell", forIndexPath: indexPath) as ReviewCell
+				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("reviewCell", forIndexPath: indexPath) as! ReviewCell
 				cell.setDetails(review, delegate: self, deleteMode: delegate?.getDeleteMode() ?? false)
 				return cell
 			}
@@ -100,7 +100,7 @@ extension CollectionsViewController : UICollectionViewDataSource, UICollectionVi
 				{
 					text = "No Results Found"
 				}
-				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("emptyCell", forIndexPath: indexPath) as EmptyCell
+				let cell = collectionView.dequeueReusableCellWithReuseIdentifier("emptyCell", forIndexPath: indexPath) as! EmptyCell
 				cell.label.text = text
 				cell.setup()
 				return cell
@@ -118,7 +118,7 @@ extension CollectionsViewController : TextbookCellDelegate, ReviewCellDelegate
 {
 	func callNumber(number: Double?)
 	{
-		if var phoneNumber = "\(number)".toInt()
+		if let phoneNumber = Int("\(number)")
 		{
 			let phoneNumberString = "\(phoneNumber)".returnMaskedPhoneText()
 			let alertController = UIAlertController(title: "Make a Phone Call", message: "Would you like to make a phone call to \(phoneNumberString)", preferredStyle: UIAlertControllerStyle.Alert)
@@ -177,7 +177,7 @@ extension CollectionsViewController : TextbookCellDelegate, ReviewCellDelegate
 				alertController.popoverPresentationController?.sourceView = sender
 				alertController.popoverPresentationController?.sourceRect = sender.superview!.frame
 				alertController.addAction(UIAlertAction(title: "Flag as Inappropriate", style: UIAlertActionStyle.Destructive, handler: {(action) in
-					var flagObject = PFObject(className: "FlaggedObjects")
+					let flagObject = PFObject(className: "FlaggedObjects")
 					flagObject["flaggedObjectId"] = objectId
 					flagObject["flaggedBy"] = PFUser.currentUser()
 					flagObject.saveEventually(nil)

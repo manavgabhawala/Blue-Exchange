@@ -93,7 +93,7 @@ class TextbookCell: UICollectionViewCell
 	{
 		if delegate == nil
 		{
-			println("No delegate")
+			print("No delegate")
 		}
 	}
 	@IBAction func flagButton(sender : UIButton)

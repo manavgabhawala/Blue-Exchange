@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		UIApplication.sharedApplication().statusBarStyle = .LightContent
 		Parse.enableLocalDatastore()
 		Parse.setApplicationId("Hv2s5UNlCaykyL5JxX5EIGYaxQrXAV6Ci2W6TikL", clientKey: "nmVHe8v5c9pmDz9Wvh8o7zWQNKO88WVmtyKL56Hy")
-		let userNotificationTypes = (UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound)
+		let userNotificationTypes: UIUserNotificationType = ([UIUserNotificationType.Alert, UIUserNotificationType.Badge, UIUserNotificationType.Sound])
 		let settings = UIUserNotificationSettings(forTypes: userNotificationTypes, categories: nil)
 		application.registerUserNotificationSettings(settings)
 		application.registerForRemoteNotifications()
@@ -33,6 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				installation["user"] = user
 				installation.saveEventually(nil)
 			}
+		}
+		
+		PFUser.currentUser().fetchIfNeeded { user, error in
+			
 		}
 		return true
 	}
@@ -75,7 +79,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		PFPush.handlePush(userInfo)
 	}
 	
-	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool
+	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool
 	{
 		// You can add your app-specific url handling code here if needed
 		return FBAppCall.handleOpenURL(url, sourceApplication: sourceApplication)

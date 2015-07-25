@@ -27,7 +27,7 @@ class HomeViewController: UIViewController
 	override func viewDidLoad()
 	{
         super.viewDidLoad()
-		subController = storyboard!.instantiateViewControllerWithIdentifier("CollectionsViewController") as CollectionsViewController
+		subController = storyboard!.instantiateViewControllerWithIdentifier("CollectionsViewController") as! CollectionsViewController
 		subController.delegate = self
 		container.addSubview(subController.view)
 		UIApplication.sharedApplication().beginIgnoringInteractionEvents()
@@ -125,7 +125,7 @@ class HomeViewController: UIViewController
 				self.loadEnd()
 				if (results != nil && error == nil)
 				{
-					self.textbooks = (results as [PFObject]).map { Textbook(object: $0, forClass: Class(object: $0["course"] as PFObject, subjectCode: ($0["course"] as PFObject)["subject"] as String)) }.filter { $0 != nil} .map { $0! }
+					self.textbooks = (results as! [PFObject]).map { Textbook(object: $0, forClass: Class(object: $0["course"] as! PFObject, subjectCode: ($0["course"] as! PFObject)["subject"] as! String)) }.filter { $0 != nil} .map { $0! }
 					self.subController.reloadTextbooks()
 				}
 				else
@@ -162,7 +162,7 @@ class HomeViewController: UIViewController
 			query.findObjectsInBackgroundWithBlock{(results, error) in
 				if (results != nil && error == nil)
 				{
-					self.reviews = (results as [PFObject]).map { Review(object: $0, forClass: Class(object: $0["course"] as PFObject, subjectCode: ($0["course"] as PFObject)["subject"] as String)) }.filter { $0 != nil }.map { $0! }
+					self.reviews = (results as! [PFObject]).map { Review(object: $0, forClass: Class(object: $0["course"] as! PFObject, subjectCode: ($0["course"] as! PFObject)["subject"] as! String)) }.filter { $0 != nil }.map { $0! }
 					if (self.course != nil) && (self.reviews.count > 0)
 					{
 						self.reviews.insert(Review.createAverageReview(self.reviews), atIndex: 0)
@@ -205,7 +205,7 @@ class HomeViewController: UIViewController
 	//MARK: - Actions
 	@IBAction func searchButton(_: UIBarButtonItem)
 	{
-		let searchController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as SearchAndComposeViewController
+		let searchController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as! SearchAndComposeViewController
 		searchController.schools = schools
 		searchController.composing = false
 		searchController.sender = self
@@ -213,7 +213,7 @@ class HomeViewController: UIViewController
 	}
 	@IBAction func composeButton(_: UIBarButtonItem)
 	{
-		let composeController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as SearchAndComposeViewController
+		let composeController = storyboard!.instantiateViewControllerWithIdentifier("SearchAndComposeViewController") as! SearchAndComposeViewController
 		composeController.composing = true
 		composeController.schools = schools
 		composeController.sender = self
@@ -221,7 +221,7 @@ class HomeViewController: UIViewController
 	}
 	@IBAction func profileButton(_: UIBarButtonItem)
 	{
-		let navigation = storyboard!.instantiateViewControllerWithIdentifier("ProfileViewController") as UINavigationController
+		let navigation = storyboard!.instantiateViewControllerWithIdentifier("ProfileViewController") as! UINavigationController
 		navigation.modalPresentationStyle = .FullScreen
 		navigation.modalTransitionStyle = .CoverVertical
 		presentViewController(navigation, animated: true, completion: nil)

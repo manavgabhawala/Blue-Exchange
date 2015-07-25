@@ -300,7 +300,7 @@ public class RatingView: UIView {
 		delegate?.floatRatingView?(self, isUpdating: rating)
     }
     
-	public override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+	public override func touchesBegan(touches: Set, withEvent event: UIEvent)
 	{
 		if let touch = touches.anyObject() as? UITouch
 		{

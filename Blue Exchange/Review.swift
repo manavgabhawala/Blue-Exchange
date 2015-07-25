@@ -11,7 +11,7 @@ import Foundation
 /**
 *  This is a model of a review that is displayed in the results controller. It is a model of the PFObject(className: "Review") with all the relevant fields.
 */
-enum CourseLoad : Int, Printable
+enum CourseLoad : Int, CustomStringConvertible
 {
 	case Easy = 0
 	case Medium, Difficult, InsanelyDifficult

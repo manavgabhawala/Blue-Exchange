@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>171C8E48-F875-4F9B-957C-C14A4FF1A5C5</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Blue Exchange</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>AE7C05896456A8B87BC83D9A2CD184B5A72491B8</key>
+		<string>https://github.com/manavgabhawala/Blue-Exchange.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Blue Exchange.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>AE7C05896456A8B87BC83D9A2CD184B5A72491B8</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/manavgabhawala/Blue-Exchange.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>AE7C05896456A8B87BC83D9A2CD184B5A72491B8</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>AE7C05896456A8B87BC83D9A2CD184B5A72491B8</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Blue-Exchange</string>
+		</dict>
+	</array>
+</dict>
+</plist>

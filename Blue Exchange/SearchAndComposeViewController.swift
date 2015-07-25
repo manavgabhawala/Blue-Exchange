@@ -129,10 +129,10 @@ class SearchAndComposeViewController: UIViewController
 		{
 			if allCells[0].count > 0
 			{
-				allCells[0].filter { $0 is PickerCell } .map { ($0 as PickerCell).picker.reloadAllComponents() }
+				allCells[0].filter { $0 is PickerCell } .map { ($0 as! PickerCell).picker.reloadAllComponents() }
 				var valueExists = false
-				let _ : [Void] = allCells[0].filter { $0 == self.selectedCell }.map { ($0 as CustomDetailCell).valueLabel.alpha = 1.0; valueExists = true }
-				allCells[0].filter { $0 is CustomDetailCell && $0 != self.selectedCell }.map { ($0 as CustomDetailCell).valueLabel.alpha = self.selectedCell != nil ? 0.3 : 1.0 }
+				let _ : [Void] = allCells[0].filter { $0 == self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = 1.0; valueExists = true }
+				allCells[0].filter { $0 is CustomDetailCell && $0 != self.selectedCell }.map { ($0 as! CustomDetailCell).valueLabel.alpha = self.selectedCell != nil ? 0.3 : 1.0 }
 			}
 		}
 	}
@@ -175,16 +175,16 @@ class SearchAndComposeViewController: UIViewController
 				let review = PFObject(className: "Review")
 				review["user"] = user
 				review["course"] = PFObject(withoutDataWithClassName: "Classes", objectId: currentClass.objectId)
-				review["rating"] = (allCells[1].filter { $0 is RatingCell }.first! as RatingCell).ratingView.rating
-				let descriptionCell = (allCells[1].filter { $0 is DescriptionCell }.first! as DescriptionCell)
+				review["rating"] = (allCells[1].filter { $0 is RatingCell }.first! as! RatingCell).ratingView.rating
+				let descriptionCell = (allCells[1].filter { $0 is DescriptionCell }.first! as! DescriptionCell)
 				let description = descriptionCell.textView.text.isEmpty ? nil : descriptionCell.textView.text
 				if description != nil { review["text"] = description }
-				let load = (allCells[1].filter { $0 is PickerCell }.first! as PickerCell).picker.selectedRowInComponent(0)
+				let load = (allCells[1].filter { $0 is PickerCell }.first! as! PickerCell).picker.selectedRowInComponent(0)
 				if load != CourseLoad.Nil.rawValue
 				{
 					review["workload"] = load
 				}
-				let anonymous = (allCells[1].filter { $0 is ShowPhoneNumber }.first! as ShowPhoneNumber).numberSwitch.on
+				let anonymous = (allCells[1].filter { $0 is ShowPhoneNumber }.first! as! ShowPhoneNumber).numberSwitch.on
 				review["anonymous"] = anonymous
 				let professor = professorCell.textField.text.isEmpty ? nil : professorCell.textField.text
 				if professor != nil { review["professor"] = professor }
@@ -203,7 +203,7 @@ class SearchAndComposeViewController: UIViewController
 			}
 			else
 			{
-				let priceCell = (allCells[1].filter {$0 is PriceCell }.first! as PriceCell)
+				let priceCell = (allCells[1].filter {$0 is PriceCell }.first! as! PriceCell)
 				let price = priceCell.textField.text.floatValue()
 				if (price == nil || abs(price!) == HUGE || price <= 0.0)
 				{
@@ -217,11 +217,11 @@ class SearchAndComposeViewController: UIViewController
 					let index = cell.segmentControl.selectedSegmentIndex
 					condition = cell.segmentControl.titleForSegmentAtIndex(index) ?? nil
 				}
-				let showPhoneNumber = (allCells[1].filter { $0 is ShowPhoneNumber }.first! as ShowPhoneNumber).numberSwitch.on
+				let showPhoneNumber = (allCells[1].filter { $0 is ShowPhoneNumber }.first! as! ShowPhoneNumber).numberSwitch.on
 				let selling = Bool(segmentControl.selectedSegmentIndex)
 				segmentControl.selectedSegmentIndex = Int(!Bool(segmentControl.selectedSegmentIndex))
 				let version = versionCell.textField.text.isEmpty ? nil : versionCell.textField.text
-				let descriptionCell = (allCells[1].filter { $0 is DescriptionCell }.first! as DescriptionCell)
+				let descriptionCell = (allCells[1].filter { $0 is DescriptionCell }.first! as! DescriptionCell)
 				let description = descriptionCell.textView.text.isEmpty ? nil : descriptionCell.textView.text
 				if (!error)
 				{
@@ -255,7 +255,7 @@ class SearchAndComposeViewController: UIViewController
 		}
 		else
 		{
-			let results = storyboard!.instantiateViewControllerWithIdentifier("HomeViewController") as HomeViewController
+			let results = storyboard!.instantiateViewControllerWithIdentifier("HomeViewController") as! HomeViewController
 			results.course = currentClass
 			if (segmentControl.selectedSegmentIndex != 2)
 			{
@@ -269,7 +269,7 @@ class SearchAndComposeViewController: UIViewController
 	}
 	@IBAction func profileButton(_ : UIBarButtonItem)
 	{
-		let navigation = storyboard!.instantiateViewControllerWithIdentifier("ProfileViewController") as UINavigationController
+		let navigation = storyboard!.instantiateViewControllerWithIdentifier("ProfileViewController") as! UINavigationController
 		navigation.modalPresentationStyle = .FullScreen
 		navigation.modalTransitionStyle = .CoverVertical
 		presentViewController(navigation, animated: true, completion: nil)
@@ -304,14 +304,14 @@ extension SearchAndComposeViewController
 				}
 				else
 				{
-					self.schools = (objects as [PFObject]).map {
+					self.schools = (objects as! [PFObject]).map {
 						School(object: $0) }
 				}
 				self.setPickerCells(School)
 				if (self.selectedCell == self.schoolCell)
 				{
 					let indexPath = NSIndexPath(forRow: self.tableView.indexPathForCell(self.schoolCell)!.row + 1, inSection: self.tableView.indexPathForCell(self.schoolCell)!.section)
-					let cell = self.tableView.cellForRowAtIndexPath(indexPath) as PickerCell
+					let cell = self.tableView.cellForRowAtIndexPath(indexPath) as! PickerCell
 					cell.picker.reloadAllComponents()
 					self.dimCells()
 				}
@@ -345,7 +345,7 @@ extension SearchAndComposeViewController
 					self.removeActivityIndicatorForCell(self.subjectCell)
 					if (error == nil)
 					{
-						self.currentSchool.addSubjects(objects as [PFObject])
+						self.currentSchool.addSubjects(objects as! [PFObject])
 						self.setPickerCells(Subject)
 						self.loadClasses()
 					}
@@ -389,7 +389,7 @@ extension SearchAndComposeViewController
 						self.removeActivityIndicatorForCell(self.classCell)
 						if (error == nil)
 						{
-							self.currentSubject.addClasses(objects as [PFObject])
+							self.currentSubject.addClasses(objects as! [PFObject])
 							self.setPickerCells(Class)
 						}
 						else
@@ -441,18 +441,18 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 {
 	func loadCells()
 	{
-		let buySellCell = tableView.dequeueReusableCellWithIdentifier("buySell") as BuySellCell
+		let buySellCell = tableView.dequeueReusableCellWithIdentifier("buySell") as! BuySellCell
 		segmentControl = buySellCell.segmentControl
 		segmentControl.addTarget(self, action: "segmentChange:", forControlEvents: UIControlEvents.ValueChanged)
 		
-		schoolCell = tableView.dequeueReusableCellWithIdentifier("detailCell") as CustomDetailCell
+		schoolCell = tableView.dequeueReusableCellWithIdentifier("detailCell") as! CustomDetailCell
 		schoolCell.valueLabel.text = "School"
-		subjectCell = tableView.dequeueReusableCellWithIdentifier("detailCell") as CustomDetailCell
+		subjectCell = tableView.dequeueReusableCellWithIdentifier("detailCell") as! CustomDetailCell
 		subjectCell.valueLabel.text = "Subject"
-		classCell = tableView.dequeueReusableCellWithIdentifier("detailCell") as CustomDetailCell
+		classCell = tableView.dequeueReusableCellWithIdentifier("detailCell") as! CustomDetailCell
 		classCell.valueLabel.text = "Class"
 		
-		let pickerCell = tableView.dequeueReusableCellWithIdentifier("pickerCell") as PickerCell
+		let pickerCell = tableView.dequeueReusableCellWithIdentifier("pickerCell") as! PickerCell
 		pickerCell.setup(self, delegate: self)
 		selectedCell = schoolCell
 		pickerCell.picker.selectRow(currentSchoolIndex, inComponent: 0, animated: true)
@@ -463,52 +463,52 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 		classPickerCells.append(subjectCell)
 		classPickerCells.append(classCell)
 		
-		let priceCell = tableView.dequeueReusableCellWithIdentifier("priceCell") as PriceCell
+		let priceCell = tableView.dequeueReusableCellWithIdentifier("priceCell") as! PriceCell
 		priceCell.setup(self, placeholder: "")
 		buyCells.append(priceCell)
 		sellCells.append(priceCell)
 		
-		let textbookTitle = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as TextFieldCell
+		let textbookTitle = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
 		textbookTitle.setup(self, placeholder: "Textbook Title")
 		self.titleCell = textbookTitle
 		buyCells.append(textbookTitle)
 		sellCells.append(textbookTitle)
 		
-		let conditionCell = tableView.dequeueReusableCellWithIdentifier("conditionCell") as ConditionCell
+		let conditionCell = tableView.dequeueReusableCellWithIdentifier("conditionCell") as! ConditionCell
 		sellCells.append(conditionCell)
 		
-		let versionCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as TextFieldCell
+		let versionCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
 		versionCell.setup(self, placeholder: "Version")
 		versionCell.textField.keyboardType = UIKeyboardType.DecimalPad
 		self.versionCell = versionCell
 		buyCells.append(versionCell)
 		sellCells.append(versionCell)
 		
-		let phoneNumberCell = tableView.dequeueReusableCellWithIdentifier("phoneNumberCell") as ShowPhoneNumber
+		let phoneNumberCell = tableView.dequeueReusableCellWithIdentifier("phoneNumberCell") as! ShowPhoneNumber
 		buyCells.append(phoneNumberCell)
 		sellCells.append(phoneNumberCell)
 		
-		let ratingCell = tableView.dequeueReusableCellWithIdentifier("ratingCell") as RatingCell
+		let ratingCell = tableView.dequeueReusableCellWithIdentifier("ratingCell") as! RatingCell
 		ratingCell.setup()
 		reviewCells.append(ratingCell)
 		
-		let courseLoad = tableView.dequeueReusableCellWithIdentifier("pickerCell") as PickerCell
+		let courseLoad = tableView.dequeueReusableCellWithIdentifier("pickerCell") as! PickerCell
 		courseLoad.setup(self, delegate: self)
 		courseLoadPicker = courseLoad.picker
 		
 		reviewCells.append(courseLoad)
 		
-		let anonoymousCell = tableView.dequeueReusableCellWithIdentifier("phoneNumberCell") as ShowPhoneNumber
+		let anonoymousCell = tableView.dequeueReusableCellWithIdentifier("phoneNumberCell") as! ShowPhoneNumber
 		anonoymousCell.label.text = "Remain Anonymous"
 		anonoymousCell.numberSwitch.on = false
 		reviewCells.append(anonoymousCell)
 		
-		let professorCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as TextFieldCell
+		let professorCell = tableView.dequeueReusableCellWithIdentifier("textFieldCell") as! TextFieldCell
 		professorCell.setup(self, placeholder: "Professor")
 		self.professorCell = professorCell
 		reviewCells.append(professorCell)
 		
-		let descriptionCell = tableView.dequeueReusableCellWithIdentifier("descriptionCell") as DescriptionCell
+		let descriptionCell = tableView.dequeueReusableCellWithIdentifier("descriptionCell") as! DescriptionCell
 		descriptionCell.setup()
 		buyCells.append(descriptionCell)
 		sellCells.append(descriptionCell)
@@ -585,7 +585,7 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 		if theClass! is School.Type
 		{
 			currentSchoolIndex = 0
-			schools.sort { $0.description < $1.description }
+			schools.sortInPlace { $0.description < $1.description }
 			schoolCell.valueLabel.text = currentSchool.description
 			setPickerCells(Subject)
 		}
@@ -626,7 +626,7 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 		dimCells()
 		if (allCells.count > 0)
 		{
-			for (i,cell) in enumerate(allCells[0])
+			for (i,cell) in allCells[0].enumerate()
 			{
 				if cell is PickerCell
 				{
@@ -679,7 +679,7 @@ extension SearchAndComposeViewController : UITableViewDataSource, UITableViewDel
 			}
 			if let cell = selectedCell as? CustomDetailCell
 			{
-				let pickerCell = tableView.dequeueReusableCellWithIdentifier("pickerCell") as PickerCell
+				let pickerCell = tableView.dequeueReusableCellWithIdentifier("pickerCell") as! PickerCell
 				pickerCell.setup(self, delegate: self)
 				self.selectedCell = cell
 				var index : Int = 0
@@ -740,7 +740,7 @@ extension SearchAndComposeViewController : UIPickerViewDataSource, UIPickerViewD
 		}
 		return 0
 	}
-	func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView!) -> UIView
+	func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView?) -> UIView
 	{
 		var string = "No data found."
 		if (pickerView == courseLoadPicker)
@@ -824,7 +824,7 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 		{
 			for cells in allCells
 			{
-				let filteredCells = cells.filter{ ($0 is TextFieldCell && ($0 as TextFieldCell).textField.isFirstResponder()) || ($0 is DescriptionCell && ($0 as DescriptionCell).textView.isFirstResponder()) }
+				let filteredCells = cells.filter{ ($0 is TextFieldCell && ($0 as! TextFieldCell).textField.isFirstResponder()) || ($0 is DescriptionCell && ($0 as! DescriptionCell).textView.isFirstResponder()) }
 				if filteredCells.count > 0
 				{
 					return filteredCells.first
@@ -839,7 +839,7 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 		var info = notification.userInfo!
 		if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue().size
 		{
-			var contentInsets = UIEdgeInsetsMake(0.0, 0.0, keyboardSize.height, 0.0)
+			let contentInsets = UIEdgeInsetsMake(0.0, 0.0, keyboardSize.height, 0.0)
 			tableView.contentInset = contentInsets
 			tableView.scrollIndicatorInsets = contentInsets
 			var rect = self.view.frame
@@ -855,26 +855,26 @@ extension SearchAndComposeViewController : UITextFieldDelegate
 	}
 	func keyboardHidden (notification: NSNotification)
 	{
-		var contentInsets = UIEdgeInsetsZero
+		let contentInsets = UIEdgeInsetsZero
 		tableView.contentInset = contentInsets
 		tableView.scrollIndicatorInsets = contentInsets
 	}
 	/**
 	This is a callback function that is called when the user hits the return key on the keyboard
 	
-	:param: textField The textfield on which has the first responder when the return key is pressed
+	- parameter textField: The textfield on which has the first responder when the return key is pressed
 	
-	:returns: Returns whether this should result in normal behaviour or not.
+	- returns: Returns whether this should result in normal behaviour or not.
 	*/
 	func textFieldShouldReturn(textField: UITextField) -> Bool
 	{
 		if allCells.count > 1
 		{
-			for (i, cell) in enumerate(allCells[1])
+			for (i, cell) in allCells[1].enumerate()
 			{
 				if (cell is TextFieldCell)
 				{
-					if (cell as TextFieldCell).textField.isFirstResponder()
+					if (cell as! TextFieldCell).textField.isFirstResponder()
 					{
 						for j in i+1..<allCells[1].count
 						{

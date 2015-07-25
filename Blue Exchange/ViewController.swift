@@ -133,7 +133,7 @@ extension ViewController
 				textFields[Fields.Email.rawValue].shakeForInvalidInput()
 				shouldReturn = true
 			}
-			if (Array(textFields[Fields.Password.rawValue].text).count < 6)
+			if (Array(textFields[Fields.Password.rawValue].text.characters).count < 6)
 			{
 				textFields[Fields.Password.rawValue].shakeForInvalidInput()
 				shouldReturn = true
@@ -151,7 +151,7 @@ extension ViewController
 			user.username = textFields[Fields.Email.rawValue].text
 			user.password = textFields[Fields.Password.rawValue].text
 			user.email = textFields[Fields.Email.rawValue].text
-			user["phone"] = textFields[Fields.PhoneNumber.rawValue].text.returnActualNumber().toInt() ?? 0
+			user["phone"] = Int(textFields[Fields.PhoneNumber.rawValue].text.returnActualNumber()) ?? 0
 			user["firstName"] = textFields[Fields.FirstName.rawValue].text
 			user["lastName"] = textFields[Fields.LastName.rawValue].text
 			user.signUpInBackgroundWithBlock {(completed, error) in
@@ -362,9 +362,9 @@ extension ViewController : UITextFieldDelegate
 	/**
 	This is a callback function that is called when the user hits the return key on the keyboard
 	
-	:param: textField The textfield on which has the first responder when the return key is pressed
+	- parameter textField: The textfield on which has the first responder when the return key is pressed
 	
-	:returns: Returns whether this should result in normal behaviour or not.
+	- returns: Returns whether this should result in normal behaviour or not.
 	*/
 	func textFieldShouldReturn(textField: UITextField) -> Bool
 	{
@@ -384,7 +384,7 @@ extension ViewController : UITextFieldDelegate
 	/**
 	This is a callback function that is called when the user finishes editing a text field.
 	
-	:param: textField The textfield which just finished editing.
+	- parameter textField: The textfield which just finished editing.
 	:discussion: This manages validating and formatting the uniqname after the user finishes writing to the text field.
 	*/
 	func textFieldDidEndEditing(textField: UITextField)
@@ -400,7 +400,7 @@ extension ViewController : UITextFieldDelegate
 	/**
 	This is a callback function that is called when the user finishes editing a text field.
 	
-	:param: textField The textfield which just finished editing.
+	- parameter textField: The textfield which just finished editing.
 	:discussion: This manages scrolling the view to the right amount so that the field being edited is always shown to the user.
 	
 	*/
@@ -414,7 +414,7 @@ extension ViewController : UITextFieldDelegate
 	/**
 	A registered notification callback for when the keyboard is shown because the user tapped on a textfield.
 	
-	:param: notification The notification that the keyboard is now shown.
+	- parameter notification: The notification that the keyboard is now shown.
 	:discussion: This function deals with creating an offset for the scroll view whenever the keyboard is shown so that the view does not think that it has the entire screen to draw in rather it has the screen minus the height of the keyboard.
 	*/
 	func keyboardShown (notification: NSNotification)
@@ -426,7 +426,7 @@ extension ViewController : UITextFieldDelegate
 			let heightIntersect = maxY - (view.frame.height - keyboardSize.height)
 			if heightIntersect > 0
 			{
-				var contentInsets = UIEdgeInsetsMake(0.0, 0.0, heightIntersect, 0.0)
+				let contentInsets = UIEdgeInsetsMake(0.0, 0.0, heightIntersect, 0.0)
 				scrollView.contentInset = contentInsets
 				scrollView.scrollIndicatorInsets = contentInsets
 			}
@@ -451,19 +451,19 @@ extension ViewController : UITextFieldDelegate
 	/**
 	A registered notification callback for when the keyboard is shown because the textfields lost responder.
 	
-	:param: notification The notification that the keyboard is now hidden.
+	- parameter notification: The notification that the keyboard is now hidden.
 	:discussion: This function deals with removing the offset created for the scroll view whenever the keyboard is hidden so that now the view knows that it has the entire screen to draw on again.
 	*/
 	func keyboardHidden (notification: NSNotification)
 	{
-		var contentInsets = UIEdgeInsetsZero
+		let contentInsets = UIEdgeInsetsZero
 		scrollView.contentInset = contentInsets
 		scrollView.scrollIndicatorInsets = contentInsets
 	}
 	/**
 	This function handles callbacks for when the phone number field is being edited and is called each time a button on the keyboard is pressed.
 	
-	:param: sender The phone number text field.
+	- parameter sender: The phone number text field.
 	*/
 	func phoneNumberMask(textField: UITextField)
 	{

@@ -25,7 +25,7 @@ class AnyObjectForClass
 		(object["user"] as? PFUser)?.fetchIfNeededInBackgroundWithBlock{(result, error) in
 			if (error == nil && result != nil)
 			{
-				self.user = result as PFUser
+				self.user = result as! PFUser
 			}
 		}
 		var actualClass : Class
@@ -41,7 +41,7 @@ class AnyObjectForClass
 				return nil
 			}
 			//obj!.fetch()
-			actualClass = Class(object: obj!, subjectCode: obj!["subject"] as String)
+			actualClass = Class(object: obj!, subjectCode: obj!["subject"] as! String)
 		}
 		forClass = actualClass
 	}

@@ -31,15 +31,15 @@ extension UIView
 	/**
 	This function shakes a UIView with a spring timing curve using the parameters to create the animations.
 	
-	:param: iterations   The number of times to shake the view back and forth before stopping
-	:param: direction    The direction in which to move the view for the first time
-	:param: currentTimes The number of times the function has been performed. Use 0 to begin with.
-	:param: size         The size of the shake. i.e. how much to move the view
-	:param: interval     The amount of time for each 'shake'.
+	- parameter iterations:   The number of times to shake the view back and forth before stopping
+	- parameter direction:    The direction in which to move the view for the first time
+	- parameter currentTimes: The number of times the function has been performed. Use 0 to begin with.
+	- parameter size:         The size of the shake. i.e. how much to move the view
+	- parameter interval:     The amount of time for each 'shake'.
 	*/
-	func shake(#iterations: Int, direction: Int, currentTimes: Int, size: CGFloat, interval: NSTimeInterval)
+	func shake(iterations iterations: Int, direction: Int, currentTimes: Int, size: CGFloat, interval: NSTimeInterval)
 	{
-		UIView.animateWithDuration(interval, delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 10, options: .allZeros, animations: {() in
+		UIView.animateWithDuration(interval, delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 10, options: [], animations: {() in
 			self.transform = CGAffineTransformMakeTranslation(size * CGFloat(direction), 0)
 			}, completion: {(finished) in
 				if (currentTimes >= iterations)
@@ -67,7 +67,7 @@ extension String
 	{
 		if countElements(self) > i
 		{
-			return String(Array(self)[i])
+			return String(Array(self.characters)[i])
 		}
 		return ""
 	}
@@ -75,9 +75,9 @@ extension String
 	/**
 	A quick access function that creates a String.Index object which is required in Swift instead of just an index.
 	
-	:param: theInt The index value that you want the String.Index to refer to.
+	- parameter theInt: The index value that you want the String.Index to refer to.
 	
-	:returns: The return value is a String.Index object which has the index you would like.
+	- returns: The return value is a String.Index object which has the index you would like.
 	*/
 	func indexAt(theInt: Int) -> String.Index
 	{
@@ -87,7 +87,7 @@ extension String
 	/**
 	This function is performed on a string and removes all the formatting/unnecessary characters and returns a String with just numbers in it. This is useful for formatting prices, phone numbers, etc.
 	
-	:returns: The string with just numbers in it.
+	- returns: The string with just numbers in it.
 	*/
 	func returnActualNumber() -> String
 	{
@@ -102,7 +102,7 @@ extension String
 	/**
 	This function can be performed on a string to make a masked string which has number formattings such as +, (, ) and -'s.
 	
-	:returns: Returns a string that contains the number masked to be in a correct format.
+	- returns: Returns a string that contains the number masked to be in a correct format.
 	*/
 	func returnMaskedPhoneText() -> String
 	{
@@ -139,7 +139,7 @@ extension String
 	{
 		var text = lowercaseString
 		var uniqname = ""
-		for character in text
+		for character in text.characters
 		{
 			if (character == "@")
 			{
@@ -160,7 +160,7 @@ extension String
 	/**
 	Check's if self contains a valid email address.
 	
-	:returns: returns true if the email address provided was valid. False otherwise.
+	- returns: returns true if the email address provided was valid. False otherwise.
 	*/
 	func isValidEmail() -> Bool
 	{
@@ -168,14 +168,19 @@ extension String
 		{
 			return false;
 		}
-		let regex = NSRegularExpression(pattern: "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", options: .CaseInsensitive, error: nil)
-		return regex?.firstMatchInString(self, options: nil, range: NSMakeRange(0, countElements(self))) != nil
+		let regex: NSRegularExpression?
+		do {
+			regex = try NSRegularExpression(pattern: "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", options: .CaseInsensitive)
+		} catch _ {
+			regex = nil
+		}
+		return regex?.firstMatchInString(self, options: [], range: NSMakeRange(0, countElements(self))) != nil
 	}
 	
 	/**
 	Converts a string to a native Float type if one exists else it returns nil
 	
-	:returns: Returns a Float or nil from the string the function is called on.
+	- returns: Returns a Float or nil from the string the function is called on.
 	*/
 	func floatValue () -> Float?
 	{
@@ -190,7 +195,7 @@ extension String
 	/**
 	Capitalizes a string using sentence case.
 	
-	:returns: A sentence cased copy of self.
+	- returns: A sentence cased copy of self.
 	*/
 	func sentenceCapitalizedString() -> String
 	{
@@ -211,15 +216,15 @@ extension UIAlertController
 {
 	/**
 	A quick access function that returns an instance of a UIAlertController with the generic title an Error occured.
-	:param: title
-	:param: message An optional string which is the message that will be displayed. If the string is a nil the default message: "An error occurred while loading the data from the internet. Please check your internet connection and try again." will be displayed.
-	:param: error An optional error whose value will take precedence over the message specified.
+	- parameter title:
+	- parameter message: An optional string which is the message that will be displayed. If the string is a nil the default message: "An error occurred while loading the data from the internet. Please check your internet connection and try again." will be displayed.
+	- parameter error: An optional error whose value will take precedence over the message specified.
 	:return: This function returns a UIAlertController instance with a dismiss action provided and can directly be displayed using the presentViewController function.
 	*/
 	class func errorAlertController(title tit: String?, message msg: String?, error: NSError?) -> UIAlertController
 	{
 		let title = tit ?? "An Error Occurred"
-		let message = error?.userInfo?["error"] as? String ?? msg ?? "An error occurred while communicating with our servers. Please check that you have a valid internet connection and try again."
+		let message = error?.userInfo["error"] as? String ?? msg ?? "An error occurred while communicating with our servers. Please check that you have a valid internet connection and try again."
 		let alertController = UIAlertController(title: title.sentenceCapitalizedString(), message: message.sentenceCapitalizedString(), preferredStyle: UIAlertControllerStyle.Alert)
 		alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Cancel, handler: nil))
 		return alertController
@@ -230,7 +235,7 @@ extension UIImage
 	/**
 	Returns an randomly generated, instantiated UIImage from the background images available to the app.
 	
-	:returns: The UIImage object that was generated and can be used as if the Image was made.
+	- returns: The UIImage object that was generated and can be used as if the Image was made.
 	*/
 	class func generateRandomBackground() -> UIImage
 	{
@@ -244,7 +249,7 @@ extension UIColor
 	/**
 	This function returns the UM Maize color
 	
-	:returns: An initialized UIColor
+	- returns: An initialized UIColor
 	*/
 	class func umMaizeColor() -> UIColor
 	{
@@ -253,7 +258,7 @@ extension UIColor
 	/**
 	This function returns the UM Blue color.
 	
-	:returns: An initialized UIColor
+	- returns: An initialized UIColor
 	*/
 	class func umBlueColor() -> UIColor
 	{
@@ -263,7 +268,7 @@ extension UIColor
 
 extension Array
 {
-	mutating func append(array: Array<T>)
+	mutating func append(array: Array<Element>)
 	{
 		array.map { self.append($0) }
 	}
@@ -271,7 +276,7 @@ extension Array
 /**
 A quick access function that opens a twitter page for a given user. If the app is installed, the twitter app will open with that user's page otherwise it will open in Safari.
 
-:param: user The user's twitter handle name.
+- parameter user: The user's twitter handle name.
 */
 func openTwitterPage(user: String)
 {
@@ -288,8 +293,8 @@ func openTwitterPage(user: String)
 
 /**
 Returns an randomly generated, instantiated UIImage from the background images available to the app.
-:param: size The size of the frame that the background image should be.
-:returns: The a background view that with a random image and blur on top if it.
+- parameter size: The size of the frame that the background image should be.
+- returns: The a background view that with a random image and blur on top if it.
 */
 func generateRandomBackground(size: CGSize) -> UIView
 {
@@ -334,5 +339,5 @@ typealias TableSectionCells = [UITableViewCell]
 
 func allKeysForValue<K, V : Equatable>(dict: [K : V], val: V) -> [K]
 {
-	return map(filter(dict) { $1 == val }) { $0.0 }
+	return dict.filter { $1 == val }.map { $0.0 }
 }

@@ -58,7 +58,7 @@ class ProfileViewController: UITableViewController
 	}
 	@IBAction func showMyPosts(_: UIButton)
 	{
-		let homeViewController = storyboard!.instantiateViewControllerWithIdentifier("HomeViewController") as HomeViewController
+		let homeViewController = storyboard!.instantiateViewControllerWithIdentifier("HomeViewController") as! HomeViewController
 		homeViewController.deleteMode = true
 		homeViewController.navigationItem.rightBarButtonItem = nil
 		homeViewController.navigationItem.leftBarButtonItem = nil
